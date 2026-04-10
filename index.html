@@ -684,13 +684,13 @@ const CONFIG = {
     }
 
     async function loadAllData() {
-      if (!supabase) return;
+      if (!supabaseClient) return;
       CONFIG_STATUS.value = 'Loading online data...';
-      const [entriesRes, officersRes, settingsRes] = await Promise.all([
-        supabase.from('dispatch_entries').select('*').order('updated_at', { ascending: false }),
-        supabase.from('dispatch_officers').select('*').order('name', { ascending: true }),
-        supabase.from('dispatch_settings').select('*').eq('key', 'shift_board').maybeSingle()
-      ]);
+const [entriesRes, officersRes, settingsRes] = await Promise.all([
+  supabaseClient.from('dispatch_entries').select('*').order('updated_at', { ascending: false }),
+  supabaseClient.from('dispatch_officers').select('*').order('name', { ascending: true }),
+  supabaseClient.from('dispatch_settings').select('*').eq('key', 'shift_board').maybeSingle()
+]);
       if (entriesRes.error || officersRes.error || settingsRes.error) {
         CONFIG_STATUS.value = 'Error loading online data';
         STATUS_BANNER.className = 'banner warn show';
@@ -722,7 +722,7 @@ const CONFIG = {
     }
 
     async function upsertOfficerRemote(officer) {
-      const { error } = await supabase.from('dispatch_officers').upsert(officer);
+      const { error } = await supabaseClient.from('dispatch_officers').upsert(officer);
       if (error) throw error;
     }
 
@@ -783,7 +783,7 @@ const CONFIG = {
     }
 
     ADD_OFFICER_BTN.addEventListener('click', async function() {
-      if (!supabase) return alert('Configure Supabase first.');
+      if (!supabaseClient) return alert('Configure Supabase first.');
       const name = OFFICER_NAME_INPUT.value.trim();
       const unit = OFFICER_UNIT_INPUT.value.trim();
       const role = OFFICER_ROLE_INPUT.value.trim();
