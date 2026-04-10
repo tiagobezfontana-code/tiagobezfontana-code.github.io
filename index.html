@@ -421,7 +421,7 @@ const CONFIG = {
     ];
 
     const supabaseReady = !CONFIG.SUPABASE_URL.includes('PASTE_') && !CONFIG.SUPABASE_ANON_KEY.includes('PASTE_');
-    const supabase = supabaseReady ? window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY) : null;
+    const supabaseClient = supabaseReady ? window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY) : null;
 
     const FORM = document.getElementById('entryForm');
     const TABLE_BODY = document.getElementById('entriesTableBody');
