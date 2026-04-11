@@ -1,856 +1,358 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FadeNotes Lab</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #f5f7fb;
-      --bg-2: #eef2f7;
-      --panel: #ffffff;
-      --panel-strong: #ffffff;
-      --panel-soft: #f8fafc;
-      --text: #18212f;
-      --muted: #64748b;
-      --accent: #4f7cff;
-      --accent-2: #3c67ea;
-      --border: #dbe4f0;
-      --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-      --shadow-strong: 0 14px 34px rgba(15, 23, 42, 0.12);
-      --danger: #d14d68;
-      --warn: #d48a1c;
-      --ok: #2f9b51;
-      --fresh: #ffffff;
-      --aging: #fff7db;
-      --fading: #ffe7df;
-      --pill-bg: #f3f6fb;
-      --handle-bg: #f3f6fb;
-    }
-
-    body.dark {
-      --bg: #0f1724;
-      --bg-2: #0b1220;
-      --panel: #141d2b;
-      --panel-strong: #182235;
-      --panel-soft: #101827;
-      --text: #e7eefc;
-      --muted: #95a6c6;
-      --accent: #7aa2ff;
-      --accent-2: #5d88ff;
-      --border: #243146;
-      --shadow: 0 12px 30px rgba(0, 0, 0, 0.26);
-      --shadow-strong: 0 18px 40px rgba(0, 0, 0, 0.38);
-      --danger: #ff7a90;
-      --warn: #ffbf52;
-      --ok: #7bd88f;
-      --fresh: #162033;
-      --aging: #332a18;
-      --fading: #3a231d;
-      --pill-bg: #1a2436;
-      --handle-bg: #1a2436;
-    }
-
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html, body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
-    }
-
-    body {
-      transition: background 0.2s ease, color 0.2s ease;
-    }
-
-    .wrap {
-      width: min(980px, calc(100% - 22px));
-      margin: 0 auto;
-      padding: 14px 0 28px;
-    }
-
-    .hero {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-
-    .hero-left {
-      min-width: 0;
-      flex: 1 1 auto;
-    }
-
-    .hero-right {
-      flex: 0 0 auto;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border: 1px solid var(--border);
-      background: var(--panel-soft);
-      border-radius: 999px;
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 10px;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(28px, 7vw, 44px);
-      line-height: 1.02;
-      letter-spacing: -0.04em;
-      font-weight: 700;
-    }
-
-    .sub {
-      margin: 8px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.45;
-      max-width: 700px;
-    }
-
-    .theme-toggle {
-      width: 50px;
-      height: 50px;
-      border: 1px solid var(--border);
-      border-radius: 50%;
-      background: var(--panel);
-      color: var(--text);
-      box-shadow: var(--shadow);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      cursor: pointer;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 350px 1fr;
-      gap: 16px;
-      align-items: start;
-    }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .form-card {
-      padding: 18px;
-      position: sticky;
-      top: 12px;
-      align-self: start;
-    }
-
-    .list-card {
-      padding: 12px;
-    }
-
-    .card-title {
-      margin: 0 0 10px;
-      font-size: 21px;
-      letter-spacing: -0.02em;
-    }
-
-    label {
-      display: block;
-      margin: 12px 0 8px;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    textarea, select, input {
-      width: 100%;
-      border: 1px solid var(--border);
-      background: var(--panel-strong);
-      color: var(--text);
-      border-radius: 16px;
-      padding: 14px 15px;
-      font-size: 16px;
-      outline: none;
-    }
-
-    textarea {
-      min-height: 240px;
-      resize: vertical;
-      line-height: 1.45;
-    }
-
-    textarea:focus, select:focus, input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(79, 124, 255, 0.12);
-    }
-
-    body.dark textarea:focus,
-    body.dark select:focus,
-    body.dark input:focus {
-      box-shadow: 0 0 0 4px rgba(122, 162, 255, 0.14);
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .actions {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      margin-top: 16px;
-    }
-
-    button {
-      border: 0;
-      border-radius: 16px;
-      padding: 13px 14px;
-      font-size: 15px;
-      min-height: 50px;
-      cursor: pointer;
-      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease, background 0.18s ease;
-      font-family: inherit;
-    }
-
-    button:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow);
-    }
-
-    button:active {
-      transform: translateY(0);
-    }
-
-    .primary {
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
-      color: white;
-      font-weight: 700;
-      box-shadow: 0 10px 22px rgba(79, 124, 255, 0.24);
-    }
-
-    .secondary {
-      background: var(--panel-strong);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    .flag-button {
-      width: 54px;
-      padding: 0;
-      font-size: 22px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .flag-button.active {
-      background: linear-gradient(135deg, #ffe6a3 0%, #ffd36a 100%);
-      color: #7a4e00;
-      border: 1px solid #f2c14e;
-      box-shadow: 0 10px 22px rgba(212, 138, 28, 0.22);
-    }
-
-    body.dark .flag-button.active {
-      background: linear-gradient(135deg, #6b4d11 0%, #8a6615 100%);
-      color: #ffe08a;
-      border-color: #9c7418;
-    }
-
-    .list-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 8px 12px;
-    }
-
-    .list-head p {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .note-list {
-      display: grid;
-      gap: 12px;
-    }
-
-    .empty {
-      padding: 28px 16px;
-      text-align: center;
-      color: var(--muted);
-      border: 1px dashed var(--border);
-      border-radius: 18px;
-      background: var(--panel-soft);
-      line-height: 1.45;
-      font-size: 15px;
-    }
-
-    .note {
-      background: var(--fresh);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 15px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.35s ease, filter 0.35s ease;
-      box-shadow: var(--shadow);
-    }
-
-    .note:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-strong);
-    }
-
-    .note.note-aging {
-      background: var(--aging);
-    }
-
-    .note.note-fading {
-      background: var(--fading);
-    }
-
-    .note.flagged {
-      box-shadow: var(--shadow), 0 0 0 2px rgba(212, 138, 28, 0.2);
-    }
-
-    .note.dragging {
-      opacity: 0.76 !important;
-      transform: scale(1.01);
-    }
-
-    .note-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-
-    .note-top-left {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .note-text {
-      white-space: pre-wrap;
-      word-break: break-word;
-      line-height: 1.5;
-      font-size: 15px;
-      color: var(--text);
-    }
-
-    .pill {
-      font-size: 12px;
-      border-radius: 999px;
-      padding: 7px 10px;
-      background: var(--pill-bg);
-      color: var(--muted);
-      border: 1px solid var(--border);
-      white-space: nowrap;
-    }
-
-    .pill.flag {
-      color: #9a6710;
-      background: #fff1c7;
-      border-color: #f1d07a;
-      font-weight: 700;
-    }
-
-    body.dark .pill.flag {
-      color: #ffd37d;
-      background: #3d2d0f;
-      border-color: #614713;
-    }
-
-    .meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-top: 14px;
-      flex-wrap: wrap;
-    }
-
-    .time {
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .note-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .tiny {
-      padding: 9px 11px;
-      font-size: 13px;
-      border-radius: 12px;
-      min-height: 40px;
-      background: var(--panel-strong);
-      border: 1px solid var(--border);
-      color: var(--text);
-    }
-
-    .tiny.danger {
-      color: var(--danger);
-    }
-
-    .tiny.extend {
-      color: var(--ok);
-    }
-
-    .tiny.flag-toggle {
-      color: var(--warn);
-    }
-
-    .note-handle {
-      width: 34px;
-      min-width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--handle-bg);
-      color: var(--muted);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      cursor: grab;
-      touch-action: none;
-      user-select: none;
-    }
-
-    .note-handle:active {
-      cursor: grabbing;
-    }
-
-    .footer {
-      margin-top: 18px;
-      color: var(--muted);
-      font-size: 13px;
-      text-align: center;
-      padding-bottom: max(8px, env(safe-area-inset-bottom));
-    }
-
-    @media (max-width: 860px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .form-card {
-        position: static;
-      }
-    }
-
-    @media (max-width: 560px) {
-      .wrap {
-        width: min(100%, calc(100% - 14px));
-        padding-top: 10px;
-      }
-
-      .hero {
-        align-items: center;
-        margin-bottom: 12px;
-      }
-
-      .badge {
-        font-size: 11px;
-      }
-
-      .sub {
-        font-size: 13px;
-      }
-
-      .row {
-        grid-template-columns: 1fr;
-      }
-
-      .actions {
-        grid-template-columns: 1fr auto;
-      }
-
-      .list-head,
-      .meta,
-      .note-top {
-        align-items: flex-start;
-      }
-
-      .note-actions {
-        width: 100%;
-      }
-
-      .note-actions .tiny {
-        flex: 1 1 auto;
-      }
-
-      .theme-toggle {
-        width: 46px;
-        height: 46px;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FadeNotes</title>
+<style>
+:root{
+--bg:#f5f6f8;
+--panel:#ffffff;
+--text:#1d1d1f;
+--muted:#6f6f74;
+--border:#e5e5ea;
+--accent:#e53935;
+--fresh:#ffffff;
+--aging:#fff2d9;
+--fading:#ffe2e2;
+}
+body.dark{
+--bg:#0f0f11;
+--panel:#1a1a1d;
+--text:#f3f3f4;
+--muted:#9a9aa1;
+--border:#2b2b31;
+--fresh:#1a1a1d;
+--aging:#2a261c;
+--fading:#2c1d1d;
+}
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family:system-ui, sans-serif;
+background:var(--bg);
+color:var(--text);
+}
+.wrap{
+max-width:900px;
+margin:auto;
+padding:20px;
+}
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+h1{margin:0;font-size:28px;}
+.theme-toggle{
+cursor:pointer;
+font-size:22px;
+background:none;
+border:none;
+color:var(--text);
+}
+.grid{
+display:grid;
+grid-template-columns:320px 1fr;
+gap:20px;
+}
+.card{
+background:var(--panel);
+border:1px solid var(--border);
+border-radius:14px;
+padding:16px;
+}
+textarea{
+width:100%;
+height:160px;
+padding:10px;
+border-radius:10px;
+border:1px solid var(--border);
+background:var(--panel);
+color:var(--text);
+}
+select,input{
+width:100%;
+padding:10px;
+border-radius:10px;
+border:1px solid var(--border);
+background:var(--panel);
+color:var(--text);
+}
+.row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:10px;
+}
+.actions{
+display:flex;
+gap:10px;
+margin-top:12px;
+}
+button{
+padding:10px 14px;
+border-radius:10px;
+border:none;
+cursor:pointer;
+}
+.primary{
+background:#333;
+color:white;
+}
+.flag-button{
+width:46px;
+font-size:20px;
+background:var(--panel);
+border:1px solid var(--border);
+}
+.flag-button.active{
+border:2px solid var(--accent);
+color:var(--accent);
+}
+.note-list{
+display:grid;
+gap:12px;
+}
+.note{
+padding:14px;
+border-radius:12px;
+border:1px solid var(--border);
+background:var(--fresh);
+transition:opacity .4s, filter .4s, transform .3s;
+}
+.note-aging{background:var(--aging)}
+.note-fading{background:var(--fading)}
+.note.flagged{border:2px solid var(--accent);}
+.meta{
+display:flex;
+justify-content:space-between;
+margin-top:10px;
+font-size:12px;
+color:var(--muted);
+}
+.note-actions{
+display:flex;
+gap:6px;
+margin-top:8px;
+}
+.note-actions button{
+font-size:12px;
+padding:6px 8px;
+}
+@media(max-width:800px){
+.grid{grid-template-columns:1fr}
+}
+</style>
 </head>
 <body>
-  <main class="wrap">
-    <section class="hero">
-      <div class="hero-left">
-        <div class="badge">FadeNotes Lab · simple theme</div>
-        <h1>Notes that expire on purpose.</h1>
-        <p class="sub">Simple light and dark themes, clean spacing, and notes that visually fade as expiration gets closer.</p>
-      </div>
-      <div class="hero-right">
-        <button class="theme-toggle" id="themeToggle" aria-label="Switch to light mode" title="Switch to light mode">☀️</button>
-      </div>
-    </section>
+<div class="wrap">
+<header>
+<h1>FadeNotes</h1>
+<button class="theme-toggle" id="themeToggle">🌙</button>
+</header>
 
-    <section class="grid">
-      <article class="card form-card">
-        <h2 class="card-title">New note</h2>
+<div class="grid">
+<div class="card">
+<textarea id="noteText" placeholder="Write temporary note..."></textarea>
 
-        <label for="noteText">Note</label>
-        <textarea id="noteText" placeholder="Examples: parking spot B12, door code, item to buy tomorrow..."></textarea>
+<div class="row">
+<select id="preset">
+<option value="1">1 hour</option>
+<option value="6">6 hours</option>
+<option value="12">12 hours</option>
+<option value="24" selected>1 day</option>
+<option value="72">3 days</option>
+<option value="168">7 days</option>
+</select>
+<input id="customHours" type="number" placeholder="Custom hours">
+</div>
 
-        <div class="row">
-          <div>
-            <label for="preset">Expires in</label>
-            <select id="preset">
-              <option value="1">1 hour</option>
-              <option value="6">6 hours</option>
-              <option value="12">12 hours</option>
-              <option value="24" selected>1 day</option>
-              <option value="72">3 days</option>
-              <option value="168">7 days</option>
-              <option value="custom">Custom</option>
-            </select>
-          </div>
-          <div>
-            <label for="customHours">Custom hours</label>
-            <input id="customHours" type="number" min="1" step="1" placeholder="Example: 36" disabled />
-          </div>
-        </div>
+<div class="actions">
+<button class="primary" id="addBtn">Save</button>
+<button class="flag-button" id="importantBtn">⚑</button>
+</div>
+</div>
 
-        <div class="actions">
-          <button class="primary" id="addBtn">Save</button>
-          <button class="secondary flag-button" id="importantBtn" type="button" aria-pressed="false" title="Flag as important">⚑</button>
-        </div>
-      </article>
+<div class="card">
+<div id="summary"></div>
+<div id="noteList" class="note-list"></div>
+</div>
+</div>
+</div>
 
-      <article class="card list-card">
-        <div class="list-head">
-          <div>
-            <h2 class="card-title">Your temporary notes</h2>
-            <p id="summary">0 active notes</p>
-          </div>
-        </div>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script>
 
-        <div id="noteList" class="note-list"></div>
-      </article>
-    </section>
+const STORAGE_KEY='fadenotes';
+const THEME_KEY='fadenotes-theme';
 
-    <div class="footer">Version v0.1 · Designed by Tiago Fontana</div>
-  </main>
+const noteText=document.getElementById('noteText');
+const preset=document.getElementById('preset');
+const customHours=document.getElementById('customHours');
+const addBtn=document.getElementById('addBtn');
+const importantBtn=document.getElementById('importantBtn');
+const noteList=document.getElementById('noteList');
+const summary=document.getElementById('summary');
+const themeToggle=document.getElementById('themeToggle');
 
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
-  <script>
-    const STORAGE_KEY = 'fadenotes-lab-v1';
-    const THEME_KEY = 'fadenotes-theme-v1';
+function loadNotes(){
+return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')
+}
 
-    const noteText = document.getElementById('noteText');
-    const preset = document.getElementById('preset');
-    const customHours = document.getElementById('customHours');
-    const addBtn = document.getElementById('addBtn');
-    const importantBtn = document.getElementById('importantBtn');
-    const noteList = document.getElementById('noteList');
-    const summary = document.getElementById('summary');
-    const themeToggle = document.getElementById('themeToggle');
+function saveNotes(n){
+localStorage.setItem(STORAGE_KEY,JSON.stringify(n))
+}
 
-    function loadNotes() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      } catch {
-        return [];
-      }
-    }
+function createNote(text,hours,flag){
+let now=Date.now()
+return{
+id:crypto.randomUUID(),
+text,
+flagged:flag,
+createdAt:now,
+expiresAt:now+hours*3600000,
+order:now
+}
+}
 
-    function saveNotes(notes) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
-    }
+function removeExpired(n){
+let now=Date.now()
+return n.filter(x=>x.expiresAt>now)
+}
 
-    function saveTheme(theme) {
-      localStorage.setItem(THEME_KEY, theme);
-    }
+function progress(note){
+let total=note.expiresAt-note.createdAt
+let left=note.expiresAt-Date.now()
+return Math.max(0,Math.min(1,left/total))
+}
 
-    function loadTheme() {
-      return localStorage.getItem(THEME_KEY) || 'dark';
-    }
+function opacity(note){
+let r=progress(note)
+return .15+r*.85
+}
 
-    function applyTheme(theme) {
-      document.body.classList.toggle('dark', theme === 'dark');
-      themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
-      themeToggle.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
-      themeToggle.setAttribute('aria-label', themeToggle.title);
-    }
+function blur(note){
+let r=progress(note)
+return (1-r)*1
+}
 
-    function getHours() {
-      if (preset.value === 'custom') {
-        const value = Number(customHours.value);
-        return Number.isFinite(value) && value > 0 ? value : null;
-      }
-      return Number(preset.value);
-    }
+function themeClass(note){
+let r=progress(note)
+if(r>.6)return''
+if(r>.25)return'note-aging'
+return'note-fading'
+}
 
-    function createNote(text, hours, flagged) {
-      const now = Date.now();
-      return {
-        id: crypto.randomUUID(),
-        text,
-        flagged,
-        createdAt: now,
-        expiresAt: now + hours * 60 * 60 * 1000,
-        order: now,
-      };
-    }
+function render(){
 
-    function removeExpired(notes) {
-      const now = Date.now();
-      return notes.filter(note => note.expiresAt > now);
-    }
+let notes=removeExpired(loadNotes())
+saveNotes(notes)
 
-    function formatRemaining(ms) {
-      if (ms <= 0) return 'expired';
-      const totalMinutes = Math.floor(ms / 60000);
-      const days = Math.floor(totalMinutes / (60 * 24));
-      const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-      const minutes = totalMinutes % 60;
+notes.sort((a,b)=>a.order-b.order)
 
-      if (days > 0) return `${days}d ${hours}h left`;
-      if (hours > 0) return `${hours}h ${minutes}m left`;
-      return `${minutes}m left`;
-    }
+summary.textContent=notes.length+" active notes"
 
-    function formatCreated(ts) {
-      return new Date(ts).toLocaleString();
-    }
+if(!notes.length){
+noteList.innerHTML="<div>No notes yet</div>"
+return
+}
 
-    function getProgress(note) {
-      const total = Math.max(1, note.expiresAt - note.createdAt);
-      const left = note.expiresAt - Date.now();
-      return Math.max(0, Math.min(1, left / total));
-    }
+noteList.innerHTML=notes.map(n=>{
 
-    function getOpacity(note) {
-      const ratio = getProgress(note);
-      return 0.12 + ratio * 0.88;
-    }
+let left=n.expiresAt-Date.now()
 
-    function getScale(note) {
-      const ratio = getProgress(note);
-      return 0.975 + ratio * 0.025;
-    }
+return`
+<div class="note ${themeClass(n)} ${n.flagged?'flagged':''}" data-id="${n.id}"
+style="opacity:${opacity(n)};filter:blur(${blur(n)}px)">
 
-    function getBlur(note) {
-      const ratio = getProgress(note);
-      return (1 - ratio) * 0.8;
-    }
+<div>${n.text}</div>
 
-    function getStatus(note) {
-      const ratio = getProgress(note);
-      if (ratio > 0.6) return 'Fresh';
-      if (ratio > 0.25) return 'Aging';
-      return 'Fading';
-    }
+<div class="meta">
+<span>${Math.floor(left/3600000)}h left</span>
+<span>${new Date(n.createdAt).toLocaleString()}</span>
+</div>
 
-    function getThemeClass(note) {
-      const ratio = getProgress(note);
-      if (ratio > 0.6) return 'note-fresh';
-      if (ratio > 0.25) return 'note-aging';
-      return 'note-fading';
-    }
+<div class="note-actions">
+<button data-a="flag" data-id="${n.id}">${n.flagged?'Unflag':'Flag'}</button>
+<button data-a="extend" data-id="${n.id}">+1d</button>
+<button data-a="del" data-id="${n.id}">Delete</button>
+</div>
 
-    function escapeHtml(text) {
-      return text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
+</div>
+`
+}).join('')
+}
 
-    function saveVisualOrder() {
-      const ids = Array.from(noteList.querySelectorAll('.note[data-id]')).map(note => note.dataset.id);
-      let notes = removeExpired(loadNotes());
-      notes = ids.map((id, index) => {
-        const found = notes.find(note => note.id === id);
-        return found ? { ...found, order: index + 1 } : null;
-      }).filter(Boolean);
-      saveNotes(notes);
-      render();
-    }
+function addNote(){
 
-    function render() {
-      let notes = removeExpired(loadNotes());
-      saveNotes(notes);
+let text=noteText.value.trim()
+let hours=Number(preset.value)||Number(customHours.value)
 
-      notes.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+if(!text)return
 
-      const flaggedCount = notes.filter(note => note.flagged).length;
-      summary.textContent = `${notes.length} active note${notes.length === 1 ? '' : 's'}${flaggedCount ? ` · ${flaggedCount} flagged` : ''}`;
+let notes=loadNotes()
 
-      if (!notes.length) {
-        noteList.innerHTML = '<div class="empty">No temporary notes yet.<br>Write one above and it will expire automatically.</div>';
-        return;
-      }
+notes.unshift(createNote(text,hours,importantBtn.classList.contains('active')))
 
-      noteList.innerHTML = notes.map(note => {
-        const left = note.expiresAt - Date.now();
-        const opacity = getOpacity(note);
-        const scale = getScale(note);
-        const blur = getBlur(note);
-        const statusLabel = getStatus(note);
-        const themeClass = getThemeClass(note);
-        return `
-          <div class="note ${themeClass} ${note.flagged ? 'flagged' : ''}" data-id="${note.id}" style="opacity:${opacity}; transform:scale(${scale}); filter:blur(${blur}px);">
-            <div class="note-top">
-              <div class="note-top-left">
-                ${note.flagged ? '<div class="pill flag">⚑ Important</div>' : ''}
-                <div class="pill">${statusLabel}</div>
-              </div>
-              <div style="display:flex; gap:8px; align-items:center;">
-                <div class="pill">${formatRemaining(left)}</div>
-                <div class="note-handle" title="Drag to reorder" aria-label="Drag to reorder">☰</div>
-              </div>
-            </div>
-            <div class="note-text">${escapeHtml(note.text)}</div>
-            <div class="meta">
-              <div class="time">Created ${formatCreated(note.createdAt)}</div>
-              <div class="note-actions">
-                <button class="tiny flag-toggle" data-action="toggle-flag" data-id="${note.id}">${note.flagged ? 'Unflag' : 'Flag'}</button>
-                <button class="tiny extend" data-action="extend" data-id="${note.id}">+1 day</button>
-                <button class="tiny danger" data-action="delete" data-id="${note.id}">Delete</button>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
+saveNotes(notes)
 
-    function addNote() {
-      const text = noteText.value.trim();
-      const hours = getHours();
+noteText.value=""
+importantBtn.classList.remove("active")
 
-      if (!text) {
-        alert('Write a note first.');
-        return;
-      }
+render()
+}
 
-      if (!hours) {
-        alert('Choose a valid expiration time.');
-        return;
-      }
+addBtn.onclick=addNote
 
-      const notes = removeExpired(loadNotes());
-      notes.unshift(createNote(text, hours, importantBtn.classList.contains('active')));
-      saveNotes(notes);
-      noteText.value = '';
-      customHours.value = '';
-      importantBtn.classList.remove('active');
-      importantBtn.setAttribute('aria-pressed', 'false');
-      if (preset.value === 'custom') {
-        preset.value = '24';
-      }
-      customHours.disabled = true;
-      render();
-    }
+importantBtn.onclick=()=>{
+importantBtn.classList.toggle("active")
+}
 
-    preset.addEventListener('change', () => {
-      customHours.disabled = preset.value !== 'custom';
-      if (!customHours.disabled) {
-        customHours.focus();
-      }
-    });
+noteList.onclick=e=>{
 
-    addBtn.addEventListener('click', addNote);
+let btn=e.target.closest("button")
+if(!btn)return
 
-    importantBtn.addEventListener('click', () => {
-      const isActive = importantBtn.classList.toggle('active');
-      importantBtn.setAttribute('aria-pressed', String(isActive));
-    });
+let id=btn.dataset.id
+let action=btn.dataset.a
 
-    themeToggle.addEventListener('click', () => {
-      const next = document.body.classList.contains('dark') ? 'light' : 'dark';
-      saveTheme(next);
-      applyTheme(next);
-    });
+let notes=loadNotes()
 
-    noteList.addEventListener('click', (event) => {
-      const button = event.target.closest('button[data-action]');
-      if (!button) return;
+if(action=="del")notes=notes.filter(n=>n.id!==id)
 
-      const action = button.dataset.action;
-      const id = button.dataset.id;
-      let notes = removeExpired(loadNotes());
+if(action=="extend"){
+notes=notes.map(n=>n.id==id?{...n,expiresAt:n.expiresAt+86400000}:n)
+}
 
-      if (action === 'delete') {
-        notes = notes.filter(note => note.id !== id);
-      }
+if(action=="flag"){
+notes=notes.map(n=>n.id==id?{...n,flagged:!n.flagged}:n)
+}
 
-      if (action === 'extend') {
-        notes = notes.map(note =>
-          note.id === id
-            ? { ...note, expiresAt: note.expiresAt + 24 * 60 * 60 * 1000 }
-            : note
-        );
-      }
+saveNotes(notes)
+render()
 
-      if (action === 'toggle-flag') {
-        notes = notes.map(note =>
-          note.id === id
-            ? { ...note, flagged: !note.flagged }
-            : note
-        );
-      }
+}
 
-      saveNotes(notes);
-      render();
-    });
+themeToggle.onclick=()=>{
+let next=document.body.classList.contains("dark")?"light":"dark"
+localStorage.setItem(THEME_KEY,next)
+applyTheme(next)
+}
 
-    noteText.addEventListener('keydown', (event) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
-        addNote();
-      }
-    });
+function applyTheme(t){
+document.body.classList.toggle("dark",t==="dark")
+themeToggle.textContent=t==="dark"?"☀":"🌙"
+}
 
-    applyTheme(loadTheme());
+applyTheme(localStorage.getItem(THEME_KEY)||"dark")
 
-    const sortable = new Sortable(noteList, {
-      animation: 180,
-      handle: '.note-handle',
-      ghostClass: 'dragging',
-      delayOnTouchOnly: true,
-      delay: 120,
-      onEnd: saveVisualOrder,
-    });
+new Sortable(noteList,{animation:150})
 
-    render();
-    setInterval(render, 30000);
-  </script>
+render()
+setInterval(render,30000)
+
+</script>
 </body>
 </html>
