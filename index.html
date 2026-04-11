@@ -1,26 +1,434 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-<title>Tiago Fontana Projects</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tiago Fontana | Project Hub</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg1: #0f172a;
+      --bg2: #111827;
+      --panel: rgba(255, 255, 255, 0.06);
+      --panel-border: rgba(255, 255, 255, 0.10);
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --blue: #2563eb;
+      --blue-hover: #1d4ed8;
+      --green: #22c55e;
+      --yellow: #f59e0b;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.18), transparent 30%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: 92%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      padding: 70px 0 35px;
+    }
+
+    .hero {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      padding: 40px 32px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.18);
+      color: #bfdbfe;
+      font-size: 0.85rem;
+      font-weight: bold;
+      letter-spacing: 0.3px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin-bottom: 24px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-weight: bold;
+      transition: 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--blue-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.12);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.08);
+      transform: translateY(-2px);
+    }
+
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .stat h3 {
+      font-size: 1.6rem;
+      margin-bottom: 4px;
+    }
+
+    .stat p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    section {
+      padding: 34px 0;
+    }
+
+    .section-header {
+      margin-bottom: 20px;
+    }
+
+    .section-header h2 {
+      font-size: 2rem;
+      margin-bottom: 6px;
+    }
+
+    .section-header p {
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      transition: 0.25s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255,255,255,0.18);
+    }
+
+    .status {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-bottom: 14px;
+    }
+
+    .status-active {
+      background: rgba(34,197,94,0.15);
+      color: #86efac;
+    }
+
+    .status-stable {
+      background: rgba(37,99,235,0.15);
+      color: #93c5fd;
+    }
+
+    .status-dev {
+      background: rgba(245,158,11,0.15);
+      color: #fde68a;
+    }
+
+    .card h3 {
+      font-size: 1.35rem;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: var(--muted);
+      margin-bottom: 18px;
+      min-height: 72px;
+    }
+
+    .card-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .mini-panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .about-text {
+      color: var(--muted);
+      max-width: 800px;
+    }
+
+    .links-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    footer {
+      margin-top: 20px;
+      padding: 24px 0 34px;
+      text-align: center;
+      color: #94a3b8;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    @media (max-width: 700px) {
+      h1 {
+        font-size: 2.2rem;
+      }
+
+      .hero {
+        padding: 28px 22px;
+      }
+
+      .section-header h2 {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="container">
 
-<h1>Tiago Fontana Projects</h1>
+    <header>
+      <div class="hero">
+        <div class="hero-top">
+          <span class="badge">PROJECT HUB</span>
+        </div>
 
-<h2>Main Tools</h2>
+        <h1>Tiago Fontana</h1>
+        <p>
+          Security tools, dispatch systems, project experiments, and practical web apps.
+          This homepage is the main entry point for my active tools and development lab.
+        </p>
 
-<ul>
-<li><a href="/dispatch/">Dispatch Console</a></li>
-</ul>
+        <div class="hero-buttons">
+          <a href="#projects" class="btn btn-primary">View Projects</a>
+          <a href="#lab" class="btn btn-secondary">Open Lab Section</a>
+          <a href="https://github.com/" target="_blank" class="btn btn-secondary">GitHub</a>
+        </div>
 
-<h2>Development Lab</h2>
+        <div class="quick-stats">
+          <div class="stat">
+            <h3>3</h3>
+            <p>Main site areas</p>
+          </div>
+          <div class="stat">
+            <h3>2</h3>
+            <p>Active tools</p>
+          </div>
+          <div class="stat">
+            <h3>1</h3>
+            <p>Testing lab</p>
+          </div>
+        </div>
+      </div>
+    </header>
 
-<ul>
-<li><a href="/lab/test1/">Lab Test</a></li>
-</ul>
+    <section id="projects">
+      <div class="section-header">
+        <h2>Featured Projects</h2>
+        <p>Main tools currently available on the website.</p>
+      </div>
 
+      <div class="grid">
+        <div class="card">
+          <span class="status status-active">ACTIVE</span>
+          <h3>Dispatch CAD</h3>
+          <p>
+            Dispatch interface project for operations, incident handling,
+            and workflow testing.
+          </p>
+          <div class="card-buttons">
+            <a href="/dispatch" class="btn btn-primary">Open Tool</a>
+            <a href="/dispatch" class="btn btn-secondary">View Page</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="status status-stable">STABLE</span>
+          <h3>Parking Permit Database</h3>
+          <p>
+            Searchable permit lookup tool designed to simplify access
+            to parking permit data.
+          </p>
+          <div class="card-buttons">
+            <a href="/parkingdb" class="btn btn-primary">Open Tool</a>
+            <a href="/parkingdb" class="btn btn-secondary">View Page</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="status status-dev">DEVELOPMENT</span>
+          <h3>Future Project Slot</h3>
+          <p>
+            Reserved space for your next app, dashboard, or security-related
+            project as your site grows.
+          </p>
+          <div class="card-buttons">
+            <a href="#lab" class="btn btn-primary">See Lab</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="lab">
+      <div class="section-header">
+        <h2>Development Lab</h2>
+        <p>Testing area for experiments, redesigns, and unfinished tools.</p>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <span class="status status-dev">TEST AREA</span>
+          <h3>Lab Test 1</h3>
+          <p>
+            Experimental project page used for trying layouts, new ideas,
+            and future tool concepts.
+          </p>
+          <div class="card-buttons">
+            <a href="/lab/test1" class="btn btn-primary">Open Lab</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="status status-dev">COMING SOON</span>
+          <h3>UI Concepts</h3>
+          <p>
+            Area for dashboard mockups, menu redesigns, and cleaner interface
+            experiments for future projects.
+          </p>
+          <div class="card-buttons">
+            <a href="#" class="btn btn-secondary">Coming Soon</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="status status-dev">COMING SOON</span>
+          <h3>Automation Tools</h3>
+          <p>
+            Reserved space for future workflow helpers, data tools,
+            and security support systems.
+          </p>
+          <div class="card-buttons">
+            <a href="#" class="btn btn-secondary">Coming Soon</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="section-header">
+        <h2>About This Site</h2>
+        <p>A simple central page for your tools and project links.</p>
+      </div>
+
+      <div class="mini-panel">
+        <p class="about-text">
+          This website works as a personal project hub for active tools,
+          prototypes, and experiments. It is designed to keep projects organized,
+          easy to open, and ready to expand as new ideas are added.
+        </p>
+
+        <div class="links-list">
+          <a href="/dispatch" class="btn btn-secondary">Dispatch</a>
+          <a href="/parkingdb" class="btn btn-secondary">Parking DB</a>
+          <a href="/lab/test1" class="btn btn-secondary">Lab Test</a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      Tiago Fontana © 2026 - Project Hub - Version 1.0
+    </footer>
+
+  </div>
 </body>
-
 </html>
