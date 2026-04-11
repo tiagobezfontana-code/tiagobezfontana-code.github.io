@@ -13,13 +13,15 @@
   --text:#1d1d1f;
   --muted:#6f7682;
   --border:#e4e7ec;
-  --accent:#e05252;
-  --accent-soft:rgba(224,82,82,0.18);
+  --accent:#ef8f8f;
+  --accent-soft:rgba(239,143,143,0.16);
+  --pin:#7a8cff;
+  --pin-soft:rgba(122,140,255,0.14);
   --button:#2f2f33;
   --button-text:#ffffff;
   --fresh:#ffffff;
   --aging:#fff3dc;
-  --fading:#ffe8e8;
+  --fading:#ffecec;
   --shadow:0 10px 28px rgba(15,23,42,0.08);
   --shadow-strong:0 14px 32px rgba(15,23,42,0.14);
   --note-shadow:0 8px 18px rgba(15,23,42,0.10);
@@ -32,13 +34,15 @@ body.dark{
   --text:#f2f4f7;
   --muted:#a1a8b3;
   --border:#343a44;
-  --accent:#ff6b6b;
-  --accent-soft:rgba(255,107,107,0.14);
+  --accent:#ff9c9c;
+  --accent-soft:rgba(255,156,156,0.12);
+  --pin:#9dacff;
+  --pin-soft:rgba(157,172,255,0.12);
   --button:#f2f4f7;
   --button-text:#15171b;
   --fresh:#242931;
   --aging:#332d21;
-  --fading:#362426;
+  --fading:#36282a;
   --shadow:0 12px 30px rgba(0,0,0,0.34);
   --shadow-strong:0 18px 38px rgba(0,0,0,0.42);
   --note-shadow:0 10px 22px rgba(0,0,0,0.28);
@@ -162,7 +166,7 @@ button{
   border:none;
   cursor:pointer;
   font:600 15px/1 "Inter",system-ui,sans-serif;
-  transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease, background .18s ease;
+  transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
 }
 
 button:hover{
@@ -182,7 +186,7 @@ button:active{
   box-shadow:0 8px 20px rgba(0,0,0,0.14);
 }
 
-.flag-button{
+.icon-button{
   width:52px;
   min-width:52px;
   min-height:48px;
@@ -202,6 +206,13 @@ button:active{
   color:var(--accent);
   background:var(--panel);
   box-shadow:0 0 0 3px var(--accent-soft), 0 8px 18px rgba(0,0,0,0.10);
+}
+
+.pin-button.active{
+  border:1px solid var(--pin);
+  color:var(--pin);
+  background:var(--panel);
+  box-shadow:0 0 0 3px var(--pin-soft), 0 8px 18px rgba(0,0,0,0.10);
 }
 
 .summary{
@@ -225,7 +236,7 @@ button:active{
   border-radius:16px;
   border:1px solid var(--border);
   background:var(--fresh);
-  transition:opacity .35s ease, transform .25s ease, box-shadow .25s ease, background .25s ease;
+  transition:opacity .35s ease, transform .25s ease, box-shadow .25s ease, background .25s ease, border-color .25s ease;
   box-shadow:var(--note-shadow);
 }
 
@@ -242,11 +253,49 @@ button:active{
   box-shadow:0 0 0 2px var(--accent-soft), var(--note-shadow);
 }
 
+.note.pinned{
+  box-shadow:0 0 0 2px var(--pin-soft), var(--note-shadow);
+}
+
+.note.flagged.pinned{
+  box-shadow:0 0 0 2px var(--accent-soft), 0 0 0 4px var(--pin-soft), var(--note-shadow);
+}
+
 .note-top{
   display:flex;
   justify-content:space-between;
   align-items:flex-start;
   gap:10px;
+}
+
+.note-badges{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:8px;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:12px;
+  font-weight:600;
+  padding:6px 10px;
+  border-radius:999px;
+  background:var(--panel-2);
+  border:1px solid var(--border);
+  color:var(--muted);
+}
+
+.badge.flagged{
+  color:var(--accent);
+  border-color:var(--accent-soft);
+}
+
+.badge.pinned{
+  color:var(--pin);
+  border-color:var(--pin-soft);
 }
 
 .note-text{
@@ -349,7 +398,8 @@ button:active{
 
       <div class="actions">
         <button class="primary" id="addBtn" type="button">Save</button>
-        <button class="flag-button" id="importantBtn" type="button" aria-pressed="false">⚑</button>
+        <button class="icon-button flag-button" id="importantBtn" type="button" aria-pressed="false" title="Flag note">⚑</button>
+        <button class="icon-button pin-button" id="pinBtn" type="button" aria-pressed="false" title="Pin note">📌</button>
       </div>
     </div>
 
@@ -370,6 +420,7 @@ const preset=document.getElementById('preset');
 const customHours=document.getElementById('customHours');
 const addBtn=document.getElementById('addBtn');
 const importantBtn=document.getElementById('importantBtn');
+const pinBtn=document.getElementById('pinBtn');
 const noteList=document.getElementById('noteList');
 const summary=document.getElementById('summary');
 const themeToggle=document.getElementById('themeToggle');
@@ -386,12 +437,13 @@ function saveNotes(notes){
   localStorage.setItem(STORAGE_KEY,JSON.stringify(notes));
 }
 
-function createNote(text,hours,flagged){
+function createNote(text,hours,flagged,pinned){
   const now=Date.now();
   return {
     id:crypto.randomUUID(),
     text,
     flagged,
+    pinned,
     createdAt:now,
     expiresAt:now + hours*3600000,
     order:now
@@ -452,10 +504,15 @@ function escapeHtml(text){
 function render(){
   let notes=removeExpired(loadNotes());
   saveNotes(notes);
-  notes.sort((a,b)=>(a.order??0)-(b.order??0));
+
+  notes.sort((a,b)=>{
+    if(Boolean(a.pinned)!==Boolean(b.pinned)) return a.pinned ? -1 : 1;
+    return (a.order??0)-(b.order??0);
+  });
 
   const flaggedCount=notes.filter(n=>n.flagged).length;
-  summary.textContent = `${notes.length} active note${notes.length===1?'':'s'}${flaggedCount?` · ${flaggedCount} flagged`:''}`;
+  const pinnedCount=notes.filter(n=>n.pinned).length;
+  summary.textContent = `${notes.length} active note${notes.length===1?'':'s'}${pinnedCount?` · ${pinnedCount} pinned`:''}${flaggedCount?` · ${flaggedCount} flagged`:''}`;
 
   if(!notes.length){
     noteList.innerHTML='<div class="empty">No notes yet</div>';
@@ -464,13 +521,19 @@ function render(){
 
   noteList.innerHTML=notes.map(note=>{
     const left=note.expiresAt-Date.now();
+    const badges = [];
+    if(note.pinned) badges.push('<span class="badge pinned">📌 Pinned</span>');
+    if(note.flagged) badges.push('<span class="badge flagged">⚑ Flagged</span>');
+
     return `
-      <div class="note ${themeClass(note)} ${note.flagged?'flagged':''}" data-id="${note.id}"
+      <div class="note ${themeClass(note)} ${note.flagged?'flagged':''} ${note.pinned?'pinned':''}" data-id="${note.id}"
         style="opacity:${opacity(note)}">
         <div class="note-top">
           <div></div>
           <div class="note-handle" aria-label="Drag to reorder" title="Drag to reorder">☰</div>
         </div>
+
+        ${badges.length ? `<div class="note-badges">${badges.join('')}</div>` : ''}
 
         <div class="note-text">${escapeHtml(note.text)}</div>
 
@@ -480,6 +543,7 @@ function render(){
         </div>
 
         <div class="note-actions">
+          <button type="button" data-a="pin" data-id="${note.id}">${note.pinned?'Unpin':'Pin'}</button>
           <button type="button" data-a="flag" data-id="${note.id}">${note.flagged?'Unflag':'Flag'}</button>
           <button type="button" data-a="extend" data-id="${note.id}">+1d</button>
           <button type="button" data-a="del" data-id="${note.id}">Delete</button>
@@ -495,13 +559,20 @@ function addNote(){
   if(!text || !hours) return;
 
   const notes=removeExpired(loadNotes());
-  notes.unshift(createNote(text,hours,importantBtn.classList.contains('active')));
+  notes.unshift(createNote(
+    text,
+    hours,
+    importantBtn.classList.contains('active'),
+    pinBtn.classList.contains('active')
+  ));
   saveNotes(notes);
 
   noteText.value='';
   customHours.value='';
   importantBtn.classList.remove('active');
   importantBtn.setAttribute('aria-pressed','false');
+  pinBtn.classList.remove('active');
+  pinBtn.setAttribute('aria-pressed','false');
   if(preset.value==='custom') preset.value='24';
   customHours.disabled=true;
 
@@ -525,6 +596,11 @@ importantBtn.addEventListener('click',()=>{
   importantBtn.setAttribute('aria-pressed', String(active));
 });
 
+pinBtn.addEventListener('click',()=>{
+  const active=pinBtn.classList.toggle('active');
+  pinBtn.setAttribute('aria-pressed', String(active));
+});
+
 themeToggle.addEventListener('click',()=>{
   const next=document.body.classList.contains('dark') ? 'light' : 'dark';
   localStorage.setItem(THEME_KEY,next);
@@ -542,6 +618,7 @@ noteList.addEventListener('click',e=>{
   if(action==='del') notes=notes.filter(n=>n.id!==id);
   if(action==='extend') notes=notes.map(n=>n.id===id ? {...n,expiresAt:n.expiresAt+86400000} : n);
   if(action==='flag') notes=notes.map(n=>n.id===id ? {...n,flagged:!n.flagged} : n);
+  if(action==='pin') notes=notes.map(n=>n.id===id ? {...n,pinned:!n.pinned} : n);
 
   saveNotes(notes);
   render();
@@ -575,3 +652,4 @@ setInterval(render,30000);
 </script>
 </body>
 </html>
+
