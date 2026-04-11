@@ -13,11 +13,10 @@
       --text: #172033;
       --muted: #64748b;
       --accent: #4f7cff;
-      --accent-2: #315ee8;
       --danger: #d64b63;
       --warn: #d48a1c;
       --ok: #2f9b51;
-      --border: rgba(23,32,51,0.08);
+      --border: rgba(23, 32, 51, 0.08);
       --shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
     }
 
@@ -29,71 +28,55 @@
       --text: #e8eefc;
       --muted: #9fb0d1;
       --accent: #7aa2ff;
-      --accent-2: #5b8cff;
       --danger: #ff6b81;
       --warn: #ffb454;
       --ok: #7bd88f;
-      --border: rgba(255,255,255,0.08);
-      --shadow: 0 16px 40px rgba(0,0,0,0.35);
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     html, body {
       margin: 0;
+      min-height: 100vh;
       font-family: Arial, Helvetica, sans-serif;
       background:
-        radial-gradient(circle at top, color-mix(in srgb, var(--accent) 15%, transparent), transparent 30%),
+        radial-gradient(circle at top, rgba(79, 124, 255, 0.12), transparent 30%),
         linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
       color: var(--text);
-      min-height: 100vh;
     }
 
-    body {
-      transition: background 0.25s ease, color 0.25s ease;
+    body.dark {
+      background:
+        radial-gradient(circle at top, rgba(122, 162, 255, 0.16), transparent 30%),
+        linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
     }
 
     .wrap {
       width: min(960px, calc(100% - 24px));
       margin: 0 auto;
-      padding: 18px 0 34px;
+      padding: 14px 0 34px;
     }
 
     .hero {
       display: flex;
-      flex-wrap: wrap;
-      align-items: start;
       justify-content: space-between;
+      align-items: flex-start;
       gap: 14px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .hero-left {
       min-width: 0;
-      flex: 1 1 300px;
+      flex: 1 1 auto;
     }
 
     .hero-right {
-      display: flex;
-      align-items: start;
-      justify-content: end;
       flex: 0 0 auto;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(28px, 7vw, 46px);
-      line-height: 1.02;
-      letter-spacing: -0.02em;
-      padding-right: 8px;
-    }
-
-    .sub {
-      color: var(--muted);
-      margin-top: 8px;
-      max-width: 700px;
-      font-size: 15px;
-      line-height: 1.4;
     }
 
     .badge {
@@ -102,7 +85,7 @@
       gap: 8px;
       padding: 9px 13px;
       border: 1px solid var(--border);
-      background: rgba(255,255,255,0.05);
+      background: rgba(255, 255, 255, 0.05);
       border-radius: 999px;
       color: var(--muted);
       font-size: 13px;
@@ -110,11 +93,26 @@
       backdrop-filter: blur(6px);
     }
 
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 7vw, 46px);
+      line-height: 1.02;
+      letter-spacing: -0.02em;
+    }
+
+    .sub {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.4;
+      max-width: 700px;
+    }
+
     .theme-toggle {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
+      width: 50px;
+      height: 50px;
       border: 1px solid var(--border);
+      border-radius: 50%;
       background: var(--panel);
       color: var(--text);
       box-shadow: var(--shadow);
@@ -132,7 +130,7 @@
     }
 
     .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
       border: 1px solid var(--border);
       border-radius: 22px;
       box-shadow: var(--shadow);
@@ -146,20 +144,20 @@
       align-self: start;
     }
 
-    .card-title {
-      font-size: 20px;
-      margin: 0 0 6px;
+    .list-card {
+      padding: 12px;
     }
 
-    .card-copy {
-      display: none;
+    .card-title {
+      margin: 0 0 10px;
+      font-size: 20px;
     }
 
     label {
       display: block;
-      font-size: 14px;
       margin: 12px 0 8px;
       color: var(--muted);
+      font-size: 14px;
     }
 
     textarea, select, input {
@@ -171,7 +169,6 @@
       padding: 13px 14px;
       font-size: 16px;
       outline: none;
-      box-shadow: none;
     }
 
     textarea {
@@ -180,7 +177,13 @@
     }
 
     textarea:focus, select:focus, input:focus {
-      border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+      border-color: rgba(79, 124, 255, 0.45);
+    }
+
+    body.dark textarea:focus,
+    body.dark select:focus,
+    body.dark input:focus {
+      border-color: rgba(122, 162, 255, 0.5);
     }
 
     .row {
@@ -189,16 +192,9 @@
       gap: 10px;
     }
 
-    .flag-button.active {
-      background: rgba(212,138,28,0.16);
-      color: var(--warn);
-      border: 1px solid rgba(212,138,28,0.28);
-      font-weight: 700;
-    }
-
     .actions {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr auto;
       gap: 10px;
       margin-top: 16px;
     }
@@ -208,13 +204,18 @@
       border-radius: 16px;
       padding: 13px 14px;
       font-size: 15px;
+      min-height: 48px;
       cursor: pointer;
       transition: transform 0.15s ease, opacity 0.15s ease, background 0.2s ease;
-      min-height: 48px;
     }
 
-    button:hover { transform: translateY(-1px); }
-    button:active { transform: translateY(0); }
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
 
     .primary {
       background: var(--accent);
@@ -223,13 +224,25 @@
     }
 
     .secondary {
-      background: rgba(255,255,255,0.08);
+      background: rgba(255, 255, 255, 0.08);
       color: var(--text);
       border: 1px solid var(--border);
     }
 
-    .list-card {
-      padding: 12px;
+    .flag-button {
+      width: 52px;
+      padding: 0;
+      font-size: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .flag-button.active {
+      background: rgba(212, 138, 28, 0.16);
+      color: var(--warn);
+      border: 1px solid rgba(212, 138, 28, 0.28);
+      font-weight: 700;
     }
 
     .list-head {
@@ -257,7 +270,7 @@
       color: var(--muted);
       border: 1px dashed var(--border);
       border-radius: 18px;
-      background: rgba(255,255,255,0.02);
+      background: rgba(255, 255, 255, 0.02);
       line-height: 1.45;
       font-size: 15px;
     }
@@ -271,14 +284,14 @@
     }
 
     .note.flagged {
-      border-color: color-mix(in srgb, var(--warn) 35%, var(--border));
-      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--warn) 22%, transparent);
+      border-color: rgba(212, 138, 28, 0.35);
+      box-shadow: inset 0 0 0 1px rgba(212, 138, 28, 0.18);
     }
 
     .note-top {
       display: flex;
       justify-content: space-between;
-      align-items: start;
+      align-items: flex-start;
       gap: 12px;
       margin-bottom: 10px;
     }
@@ -292,16 +305,16 @@
 
     .note-text {
       white-space: pre-wrap;
+      word-break: break-word;
       line-height: 1.45;
       font-size: 15px;
-      word-break: break-word;
     }
 
     .pill {
       font-size: 12px;
       border-radius: 999px;
       padding: 6px 10px;
-      background: rgba(255,255,255,0.06);
+      background: rgba(255, 255, 255, 0.06);
       color: var(--muted);
       border: 1px solid var(--border);
       white-space: nowrap;
@@ -309,8 +322,8 @@
 
     .pill.flag {
       color: #fff;
-      background: color-mix(in srgb, var(--warn) 72%, transparent);
-      border-color: color-mix(in srgb, var(--warn) 45%, transparent);
+      background: rgba(212, 138, 28, 0.85);
+      border-color: rgba(212, 138, 28, 0.45);
     }
 
     .meta {
@@ -341,21 +354,21 @@
     }
 
     .tiny.danger {
-      background: rgba(214,75,99,0.12);
+      background: rgba(214, 75, 99, 0.12);
       color: var(--danger);
-      border: 1px solid rgba(214,75,99,0.18);
+      border: 1px solid rgba(214, 75, 99, 0.18);
     }
 
     .tiny.extend {
-      background: rgba(47,155,81,0.12);
+      background: rgba(47, 155, 81, 0.12);
       color: var(--ok);
-      border: 1px solid rgba(47,155,81,0.18);
+      border: 1px solid rgba(47, 155, 81, 0.18);
     }
 
     .tiny.flag-toggle {
-      background: rgba(212,138,28,0.12);
+      background: rgba(212, 138, 28, 0.12);
       color: var(--warn);
-      border: 1px solid rgba(212,138,28,0.18);
+      border: 1px solid rgba(212, 138, 28, 0.18);
     }
 
     .footer {
@@ -370,6 +383,7 @@
       .grid {
         grid-template-columns: 1fr;
       }
+
       .form-card {
         position: static;
       }
@@ -395,14 +409,7 @@
       }
 
       .actions {
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 8px;
-      }
-
-      .actions button {
-        padding-left: 8px;
-        padding-right: 8px;
-        font-size: 13px;
+        grid-template-columns: 1fr auto;
       }
 
       .list-head,
@@ -435,14 +442,13 @@
         <p class="sub">A lightweight notes app for things you only need for a few hours or a few days. Notes fade as they age and delete themselves when time runs out.</p>
       </div>
       <div class="hero-right">
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle light and dark mode" title="Toggle light and dark mode">🌙</button>
+        <button class="theme-toggle" id="themeToggle" aria-label="Switch to light mode" title="Switch to light mode">☀️</button>
       </div>
     </section>
 
     <section class="grid">
       <article class="card form-card">
         <h2 class="card-title">New note</h2>
-        
 
         <label for="noteText">Note</label>
         <textarea id="noteText" placeholder="Examples: parking spot B12, door code, item to buy tomorrow..."></textarea>
@@ -468,8 +474,7 @@
 
         <div class="actions">
           <button class="primary" id="addBtn">Save</button>
-          
-          <button class="secondary flag-button" id="importantBtn" type="button" aria-pressed="false">⚑</button>
+          <button class="secondary flag-button" id="importantBtn" type="button" aria-pressed="false" title="Flag as important">⚑</button>
         </div>
       </article>
 
@@ -495,9 +500,8 @@
     const noteText = document.getElementById('noteText');
     const preset = document.getElementById('preset');
     const customHours = document.getElementById('customHours');
-    const importantBtn = document.getElementById('importantBtn');
     const addBtn = document.getElementById('addBtn');
-    const unusedClearBtn = document.getElementById('clearExpiredBtn');
+    const importantBtn = document.getElementById('importantBtn');
     const noteList = document.getElementById('noteList');
     const summary = document.getElementById('summary');
     const themeToggle = document.getElementById('themeToggle');
@@ -590,7 +594,7 @@
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
-        .replace(/\"/g, '&quot;')
+        .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
     }
 
@@ -659,23 +663,22 @@
       customHours.value = '';
       importantBtn.classList.remove('active');
       importantBtn.setAttribute('aria-pressed', 'false');
-      if (preset.value === 'custom') preset.value = '24';
+      if (preset.value === 'custom') {
+        preset.value = '24';
+      }
       customHours.disabled = true;
-      render();
-    }
-
-    function clearExpiredNow() {
-      saveNotes(removeExpired(loadNotes()));
       render();
     }
 
     preset.addEventListener('change', () => {
       customHours.disabled = preset.value !== 'custom';
-      if (!customHours.disabled) customHours.focus();
+      if (!customHours.disabled) {
+        customHours.focus();
+      }
     });
 
     addBtn.addEventListener('click', addNote);
-    clearExpiredBtn.addEventListener('click', clearExpiredNow);
+
     importantBtn.addEventListener('click', () => {
       const isActive = importantBtn.classList.toggle('active');
       importantBtn.setAttribute('aria-pressed', String(isActive));
