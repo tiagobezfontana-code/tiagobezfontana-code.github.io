@@ -8,20 +8,21 @@
 <style>
 :root{
   --bg:#f4f6f8;
-  --panel:#ffffff;
-  --panel-2:#f8fafc;
+  --panel:#eef2f6;
+  --panel-2:#f7f9fc;
+  --note-base:#ffffff;
   --text:#1d1d1f;
   --muted:#6f7682;
-  --border:#e4e7ec;
-  --accent:#ef8f8f;
-  --accent-soft:rgba(239,143,143,0.16);
-  --pin:#7a8cff;
-  --pin-soft:rgba(122,140,255,0.14);
+  --border:#e1e6ee;
+  --flag:#ef9a9a;
+  --flag-soft:rgba(239,154,154,0.16);
+  --favorite:#7da7ff;
+  --favorite-soft:rgba(125,167,255,0.16);
   --button:#2f2f33;
   --button-text:#ffffff;
   --fresh:#ffffff;
-  --aging:#fff3dc;
-  --fading:#ffecec;
+  --aging:#fff4df;
+  --fading:#fff0f0;
   --shadow:0 10px 28px rgba(15,23,42,0.08);
   --shadow-strong:0 14px 32px rgba(15,23,42,0.14);
   --note-shadow:0 8px 18px rgba(15,23,42,0.10);
@@ -29,20 +30,21 @@
 
 body.dark{
   --bg:#15171b;
-  --panel:#22262d;
-  --panel-2:#1b1f25;
+  --panel:#1f242b;
+  --panel-2:#262c35;
+  --note-base:#2b313b;
   --text:#f2f4f7;
   --muted:#a1a8b3;
   --border:#343a44;
-  --accent:#ff9c9c;
-  --accent-soft:rgba(255,156,156,0.12);
-  --pin:#9dacff;
-  --pin-soft:rgba(157,172,255,0.12);
+  --flag:#ffaaaa;
+  --flag-soft:rgba(255,170,170,0.12);
+  --favorite:#9bb1ff;
+  --favorite-soft:rgba(155,177,255,0.14);
   --button:#f2f4f7;
   --button-text:#15171b;
-  --fresh:#242931;
-  --aging:#332d21;
-  --fading:#36282a;
+  --fresh:#2b313b;
+  --aging:#3a3428;
+  --fading:#3b2f31;
   --shadow:0 12px 30px rgba(0,0,0,0.34);
   --shadow-strong:0 18px 38px rgba(0,0,0,0.42);
   --note-shadow:0 10px 22px rgba(0,0,0,0.28);
@@ -88,12 +90,12 @@ h1{
   justify-content:center;
   font-size:22px;
   line-height:1;
-  background:var(--panel);
+  background:var(--note-base);
   color:var(--text);
   border:1px solid var(--border);
   border-radius:14px;
-  width:50px;
-  height:50px;
+  width:52px;
+  height:52px;
   box-shadow:var(--shadow);
   padding:0;
 }
@@ -118,7 +120,7 @@ textarea{
   padding:14px;
   border-radius:14px;
   border:1px solid var(--border);
-  background:var(--panel-2);
+  background:var(--note-base);
   color:var(--text);
   resize:vertical;
   outline:none;
@@ -136,7 +138,7 @@ select,input{
   padding:12px 14px;
   border-radius:14px;
   border:1px solid var(--border);
-  background:var(--panel-2);
+  background:var(--note-base);
   color:var(--text);
   outline:none;
   font:500 15px/1.2 "Inter",system-ui,sans-serif;
@@ -155,7 +157,8 @@ textarea:focus,select:focus,input:focus{
 }
 
 .actions{
-  display:flex;
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
   gap:12px;
   margin-top:14px;
 }
@@ -181,20 +184,19 @@ button:active{
   background:var(--button);
   color:var(--button-text);
   font-weight:700;
-  min-height:48px;
-  min-width:92px;
+  min-height:50px;
+  width:100%;
   box-shadow:0 8px 20px rgba(0,0,0,0.14);
 }
 
 .icon-button{
-  width:52px;
-  min-width:52px;
-  min-height:48px;
+  min-height:50px;
+  width:100%;
   font-size:20px;
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  background:var(--panel-2);
+  background:var(--note-base);
   color:var(--text);
   border:1px solid var(--border);
   box-shadow:0 6px 16px rgba(0,0,0,0.08);
@@ -202,17 +204,17 @@ button:active{
 }
 
 .flag-button.active{
-  border:1px solid var(--accent);
-  color:var(--accent);
-  background:var(--panel);
-  box-shadow:0 0 0 3px var(--accent-soft), 0 8px 18px rgba(0,0,0,0.10);
+  border:1px solid var(--flag);
+  color:var(--flag);
+  background:var(--panel-2);
+  box-shadow:0 0 0 3px var(--flag-soft), 0 8px 18px rgba(0,0,0,0.10);
 }
 
-.pin-button.active{
-  border:1px solid var(--pin);
-  color:var(--pin);
-  background:var(--panel);
-  box-shadow:0 0 0 3px var(--pin-soft), 0 8px 18px rgba(0,0,0,0.10);
+.favorite-button.active{
+  border:1px solid var(--favorite);
+  color:var(--favorite);
+  background:var(--panel-2);
+  box-shadow:0 0 0 3px var(--favorite-soft), 0 8px 18px rgba(0,0,0,0.10);
 }
 
 .summary{
@@ -249,16 +251,16 @@ button:active{
 .note-fading{background:var(--fading)}
 
 .note.flagged{
-  border:1px solid var(--accent);
-  box-shadow:0 0 0 2px var(--accent-soft), var(--note-shadow);
+  border:1px solid var(--flag);
+  box-shadow:0 0 0 2px var(--flag-soft), var(--note-shadow);
 }
 
-.note.pinned{
-  box-shadow:0 0 0 2px var(--pin-soft), var(--note-shadow);
+.note.favorite{
+  box-shadow:0 0 0 2px var(--favorite-soft), var(--note-shadow);
 }
 
-.note.flagged.pinned{
-  box-shadow:0 0 0 2px var(--accent-soft), 0 0 0 4px var(--pin-soft), var(--note-shadow);
+.note.flagged.favorite{
+  box-shadow:0 0 0 2px var(--flag-soft), 0 0 0 4px var(--favorite-soft), var(--note-shadow);
 }
 
 .note-top{
@@ -289,13 +291,13 @@ button:active{
 }
 
 .badge.flagged{
-  color:var(--accent);
-  border-color:var(--accent-soft);
+  color:var(--flag);
+  border-color:var(--flag-soft);
 }
 
-.badge.pinned{
-  color:var(--pin);
-  border-color:var(--pin-soft);
+.badge.favorite{
+  color:var(--favorite);
+  border-color:var(--favorite-soft);
 }
 
 .note-text{
@@ -365,7 +367,6 @@ button:active{
 @media(max-width:520px){
   .wrap{padding:14px}
   .actions{gap:10px}
-  .primary{flex:1 1 auto}
   .card{padding:14px}
   .note{padding:14px}
 }
@@ -399,7 +400,7 @@ button:active{
       <div class="actions">
         <button class="primary" id="addBtn" type="button">Save</button>
         <button class="icon-button flag-button" id="importantBtn" type="button" aria-pressed="false" title="Flag note">⚑</button>
-        <button class="icon-button pin-button" id="pinBtn" type="button" aria-pressed="false" title="Pin note">📌</button>
+        <button class="icon-button favorite-button" id="favoriteBtn" type="button" aria-pressed="false" title="Favorite note">★</button>
       </div>
     </div>
 
@@ -420,7 +421,7 @@ const preset=document.getElementById('preset');
 const customHours=document.getElementById('customHours');
 const addBtn=document.getElementById('addBtn');
 const importantBtn=document.getElementById('importantBtn');
-const pinBtn=document.getElementById('pinBtn');
+const favoriteBtn=document.getElementById('favoriteBtn');
 const noteList=document.getElementById('noteList');
 const summary=document.getElementById('summary');
 const themeToggle=document.getElementById('themeToggle');
@@ -437,13 +438,13 @@ function saveNotes(notes){
   localStorage.setItem(STORAGE_KEY,JSON.stringify(notes));
 }
 
-function createNote(text,hours,flagged,pinned){
+function createNote(text,hours,flagged,favorite){
   const now=Date.now();
   return {
     id:crypto.randomUUID(),
     text,
     flagged,
-    pinned,
+    favorite,
     createdAt:now,
     expiresAt:now + hours*3600000,
     order:now
@@ -506,13 +507,13 @@ function render(){
   saveNotes(notes);
 
   notes.sort((a,b)=>{
-    if(Boolean(a.pinned)!==Boolean(b.pinned)) return a.pinned ? -1 : 1;
+    if(Boolean(a.favorite)!==Boolean(b.favorite)) return a.favorite ? -1 : 1;
     return (a.order??0)-(b.order??0);
   });
 
   const flaggedCount=notes.filter(n=>n.flagged).length;
-  const pinnedCount=notes.filter(n=>n.pinned).length;
-  summary.textContent = `${notes.length} active note${notes.length===1?'':'s'}${pinnedCount?` · ${pinnedCount} pinned`:''}${flaggedCount?` · ${flaggedCount} flagged`:''}`;
+  const favoriteCount=notes.filter(n=>n.favorite).length;
+  summary.textContent = `${notes.length} active note${notes.length===1?'':'s'}${favoriteCount?` · ${favoriteCount} favorite`:''}${favoriteCount>1?'s':''}${flaggedCount?` · ${flaggedCount} flagged`:''}`;
 
   if(!notes.length){
     noteList.innerHTML='<div class="empty">No notes yet</div>';
@@ -522,11 +523,11 @@ function render(){
   noteList.innerHTML=notes.map(note=>{
     const left=note.expiresAt-Date.now();
     const badges = [];
-    if(note.pinned) badges.push('<span class="badge pinned">📌 Pinned</span>');
+    if(note.favorite) badges.push('<span class="badge favorite">★ Favorite</span>');
     if(note.flagged) badges.push('<span class="badge flagged">⚑ Flagged</span>');
 
     return `
-      <div class="note ${themeClass(note)} ${note.flagged?'flagged':''} ${note.pinned?'pinned':''}" data-id="${note.id}"
+      <div class="note ${themeClass(note)} ${note.flagged?'flagged':''} ${note.favorite?'favorite':''}" data-id="${note.id}"
         style="opacity:${opacity(note)}">
         <div class="note-top">
           <div></div>
@@ -543,7 +544,7 @@ function render(){
         </div>
 
         <div class="note-actions">
-          <button type="button" data-a="pin" data-id="${note.id}">${note.pinned?'Unpin':'Pin'}</button>
+          <button type="button" data-a="favorite" data-id="${note.id}">${note.favorite?'Unfavorite':'Favorite'}</button>
           <button type="button" data-a="flag" data-id="${note.id}">${note.flagged?'Unflag':'Flag'}</button>
           <button type="button" data-a="extend" data-id="${note.id}">+1d</button>
           <button type="button" data-a="del" data-id="${note.id}">Delete</button>
@@ -563,7 +564,7 @@ function addNote(){
     text,
     hours,
     importantBtn.classList.contains('active'),
-    pinBtn.classList.contains('active')
+    favoriteBtn.classList.contains('active')
   ));
   saveNotes(notes);
 
@@ -571,8 +572,8 @@ function addNote(){
   customHours.value='';
   importantBtn.classList.remove('active');
   importantBtn.setAttribute('aria-pressed','false');
-  pinBtn.classList.remove('active');
-  pinBtn.setAttribute('aria-pressed','false');
+  favoriteBtn.classList.remove('active');
+  favoriteBtn.setAttribute('aria-pressed','false');
   if(preset.value==='custom') preset.value='24';
   customHours.disabled=true;
 
@@ -596,9 +597,9 @@ importantBtn.addEventListener('click',()=>{
   importantBtn.setAttribute('aria-pressed', String(active));
 });
 
-pinBtn.addEventListener('click',()=>{
-  const active=pinBtn.classList.toggle('active');
-  pinBtn.setAttribute('aria-pressed', String(active));
+favoriteBtn.addEventListener('click',()=>{
+  const active=favoriteBtn.classList.toggle('active');
+  favoriteBtn.setAttribute('aria-pressed', String(active));
 });
 
 themeToggle.addEventListener('click',()=>{
@@ -618,7 +619,7 @@ noteList.addEventListener('click',e=>{
   if(action==='del') notes=notes.filter(n=>n.id!==id);
   if(action==='extend') notes=notes.map(n=>n.id===id ? {...n,expiresAt:n.expiresAt+86400000} : n);
   if(action==='flag') notes=notes.map(n=>n.id===id ? {...n,flagged:!n.flagged} : n);
-  if(action==='pin') notes=notes.map(n=>n.id===id ? {...n,pinned:!n.pinned} : n);
+  if(action==='favorite') notes=notes.map(n=>n.id===id ? {...n,favorite:!n.favorite} : n);
 
   saveNotes(notes);
   render();
@@ -652,4 +653,3 @@ setInterval(render,30000);
 </script>
 </body>
 </html>
-
