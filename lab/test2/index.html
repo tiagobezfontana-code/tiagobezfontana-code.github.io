@@ -175,6 +175,13 @@
       resize: vertical;
     }
 
+    textarea::placeholder {
+      font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
+      letter-spacing: 0.01em;
+      color: var(--muted);
+      opacity: 0.9;
+    }
+
     textarea:focus, select:focus, input:focus {
       border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
     }
@@ -194,7 +201,7 @@
 
     .actions {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
       margin-top: 16px;
     }
@@ -430,7 +437,7 @@
       }
 
       .actions {
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 8px;
       }
 
@@ -489,12 +496,13 @@
         <h2 class="card-title">New note</h2>
 
         <label for="noteText">Note</label>
-        <textarea id="noteText" placeholder="Examples: parking spot B12, door code, item to buy tomorrow..."></textarea>
+        <textarea id="noteText" placeholder="Parking spot B12, door code, item to buy tomorrow..."></textarea>
 
         <div class="row">
           <div>
             <label for="preset">Expires in</label>
             <select id="preset">
+              <option value="1">1 hour</option>
               <option value="6">6 hours</option>
               <option value="12">12 hours</option>
               <option value="24" selected>1 day</option>
@@ -505,13 +513,12 @@
           </div>
           <div>
             <label for="customHours">Custom hours</label>
-            <input id="customHours" type="number" min="1" step="1" placeholder="Example: 36" disabled />
+            <input id="customHours" type="number" min="1" step="1" placeholder="36" disabled />
           </div>
         </div>
 
         <div class="actions">
           <button class="primary" id="addBtn">Save note</button>
-          <button class="secondary" id="clearExpiredBtn">Clear expired now</button>
           <button class="secondary flag-button" id="importantBtn" type="button" aria-pressed="false">Flag as important</button>
         </div>
       </article>
@@ -540,7 +547,6 @@
     const customHours = document.getElementById('customHours');
     const importantBtn = document.getElementById('importantBtn');
     const addBtn = document.getElementById('addBtn');
-    const clearExpiredBtn = document.getElementById('clearExpiredBtn');
     const noteList = document.getElementById('noteList');
     const summary = document.getElementById('summary');
     const themeToggle = document.getElementById('themeToggle');
@@ -723,18 +729,12 @@
       render();
     }
 
-    function clearExpiredNow() {
-      saveNotes(removeExpired(loadNotes()));
-      render();
-    }
-
     preset.addEventListener('change', () => {
       customHours.disabled = preset.value !== 'custom';
       if (!customHours.disabled) customHours.focus();
     });
 
     addBtn.addEventListener('click', addNote);
-    clearExpiredBtn.addEventListener('click', clearExpiredNow);
 
     importantBtn.addEventListener('click', () => {
       const isActive = importantBtn.classList.toggle('active');
