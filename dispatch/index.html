@@ -1,1 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>University Dispatch Console</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --panel: #121b2e;
+      --panel-2: #18233b;
+      --line: #2b3a5c;
+      --text: #e9eefc;
+      --muted: #aab7d6;
+      --accent: #4da3ff;
+      --danger: #dc3545;
+      --warning: #f0ad4e;
+      --success: #2ca35e;
+      --shadow: 0 10px 25px rgba(0,0,0,0.25);
+      --radius: 14px;
+      --body-bg: linear-gradient(180deg, #08101c, #0e1626 30%, #0b1220 100%);
+      --topbar-bg: linear-gradient(135deg, #1b2742, #101a2d);
+      --header-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+      --table-header-bg: #16233b;
+      --hover-bg: rgba(255,255,255,0.03);
+      --toolbar-bg: rgba(255,255,255,0.02);
+    }
+    body.light-mode {
+      --panel: #ffffff;
+      --panel-2: #f4f7fc;
+      --line: #c9d7ef;
+      --text: #17243c;
+      --muted: #5f6f8d;
+      --accent: #2f7dd3;
+      --danger: #c53b46;
+      --warning: #d89a2f;
+      --success: #2d8d57;
+      --shadow: 0 10px 25px rgba(24,42,74,0.12);
+      --body-bg: linear-gradient(180deg, #f6f9ff, #edf3fb 40%, #e8effa 100%);
+      --topbar-bg: linear-gradient(135deg, #ffffff, #eef4ff);
+      --header-bg: linear-gradient(180deg, rgba(23,36,60,0.03), rgba(23,36,60,0));
+      --table-header-bg: #e8f0fb;
+      --hover-bg: rgba(23,36,60,0.04);
+      --toolbar-bg: rgba(23,36,60,0.03);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--body-bg);
+      color: var(--text);
+    }
+    .app { max-width: 1680px; margin: 0 auto; padding: 18px; }
+    .topbar {
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      background: var(--topbar-bg); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 16px 18px; box-shadow: var(--shadow); margin-bottom: 18px;
+    }
+    .title-wrap h1 { margin: 0; font-size: 30px; }
+    .title-wrap p { margin: 5px 0 0; color: var(--muted); font-size: 14px; }
+    .clock { text-align: right; font-size: 14px; color: var(--muted); min-width: 180px; }
 
+    .panel {
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .panel-header {
+      background: var(--header-bg); border-bottom: 1px solid var(--line);
+      padding: 14px 16px; font-size: 16px; font-weight: 700;
+    }
+    .panel-body { padding: 16px; }
+    .banner {
+      padding: 10px 12px; border-radius: 10px; margin-bottom: 12px; display: none;
+      border: 1px solid transparent;
+    }
+    .banner.show { display: block; }
+    .banner.ok { background: rgba(44,163,94,0.15); border-color: rgba(44,163,94,0.35); color: #8ce0ae; }
+    .banner.warn { background: rgba(240,173,78,0.15); border-color: rgba(240,173,78,0.35); color: #ffd28a; }
+    .banner.err { background: rgba(220,53,69,0.15); border-color: rgba(220,53,69,0.35); color: #ff9da7; }
+
+    .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 18px 0; }
+    .stat-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); }
+    .stat-card .label { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+    .stat-card .value { font-size: 28px; font-weight: 700; }
+
+    .grid { display: grid; grid-template-columns: 430px minmax(0, 1fr); gap: 18px; align-items: start; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+    label { font-size: 13px; color: var(--muted); }
+
+    input, select, textarea {
+      width: 100%; padding: 11px 12px; border-radius: 10px; border: 1px solid #33466f;
+      background: var(--panel-2); color: var(--text); outline: none; font-size: 14px;
+    }
+    input[readonly] { opacity: 0.9; }
+    textarea { min-height: 88px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(77,163,255,0.15); }
+
+    button {
+      border: none; border-radius: 10px; padding: 11px 14px; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+    button:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+    .primary { background: var(--accent); color: white; }
+    .secondary { background: #31466d; color: white; }
+    .danger { background: var(--danger); color: white; }
+    .warning { background: var(--warning); color: #1c1c1c; }
+    .success { background: var(--success); color: white; }
+    .ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+
+    .btn-row, .chip-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chip-row { margin-bottom: 14px; }
+    .chip-btn { padding: 8px 11px; font-size: 12px; border-radius: 999px; background: var(--panel-2); color: var(--text); border: 1px solid var(--line); }
+
+    .toolbar {
+      display: grid; grid-template-columns: minmax(220px, 1.3fr) minmax(140px, 0.9fr) minmax(140px, 0.9fr) auto auto auto;
+      gap: 10px; padding: 16px; border-bottom: 1px solid var(--line); background: var(--toolbar-bg); align-items: center;
+    }
+    .shift-toolbar, .officer-toolbar, .config-toolbar { display: grid; gap: 10px; align-items: center; }
+    .shift-toolbar { grid-template-columns: 1fr 1fr auto; }
+    .officer-toolbar { grid-template-columns: 1.2fr 0.8fr 0.9fr 0.8fr auto; }
+    .config-toolbar { grid-template-columns: 1fr 1fr auto; }
+
+    .officer-card {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      padding: 10px 12px; margin-bottom: 8px; background: var(--panel-2);
+      border: 1px solid var(--line); border-radius: 10px;
+    }
+
+    .table-wrap { overflow: auto; max-height: 70vh; }
+    table { width: 100%; border-collapse: collapse; min-width: 1450px; }
+    th, td {
+      text-align: left; padding: 10px 10px; border-bottom: 1px solid rgba(255,255,255,0.06);
+      vertical-align: top; font-size: 13px; overflow-wrap: anywhere; word-break: break-word;
+    }
+    th { position: sticky; top: 0; background: var(--table-header-bg); color: var(--text); z-index: 1; }
+    tr:hover td { background: var(--hover-bg); }
+
+    .badge { display: inline-block; padding: 5px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.2px; }
+    .status-open { background: rgba(240,173,78,0.2); color: #ffd28a; }
+    .status-dispatched { background: rgba(77,163,255,0.2); color: #93c7ff; }
+    .status-enroute { background: rgba(143,108,255,0.2); color: #c1adff; }
+    .status-onscene { background: rgba(44,163,94,0.2); color: #8ce0ae; }
+    .status-closed { background: rgba(170,170,170,0.18); color: #d9d9d9; }
+
+    .officer-available { background: rgba(44,163,94,0.2); color: #8ce0ae; }
+    .officer-dispatched { background: rgba(77,163,255,0.2); color: #93c7ff; }
+    .officer-enroute { background: rgba(143,108,255,0.2); color: #c1adff; }
+    .officer-onscene { background: rgba(240,173,78,0.2); color: #ffd28a; }
+    .officer-meal { background: rgba(170,170,170,0.18); color: #d9d9d9; }
+    .officer-outofservice { background: rgba(220,53,69,0.2); color: #ff9da7; }
+
+    .priority-low { color: #b9c7e8; }
+    .priority-medium { color: #ffd28a; }
+    .priority-high { color: #ff9d8e; font-weight: 700; }
+    .priority-critical { color: #ff7070; font-weight: 700; }
+
+    .small { color: var(--muted); font-size: 12px; }
+    .mono { font-family: Consolas, Monaco, monospace; font-size: 12px; }
+    .notes-cell { white-space: normal; line-height: 1.35; }
+    .empty { padding: 28px; text-align: center; color: var(--muted); }
+    .footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 18px; padding: 10px; }
+
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: none;
+      align-items: center; justify-content: center; padding: 20px; z-index: 30;
+    }
+    .modal { width: min(980px, 100%); max-height: 90vh; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); }
+    .modal.show, .modal-backdrop.show { display: flex; }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+    .modal-body { padding: 16px; }
+    .timeline-item { padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.08); }
+
+    @media (max-width: 1180px) {
+      .grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .toolbar, .shift-toolbar, .officer-toolbar, .config-toolbar { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 720px) {
+      .stats, .form-grid, .toolbar, .shift-toolbar, .officer-toolbar, .config-toolbar { grid-template-columns: 1fr; }
+      .topbar { flex-direction: column; align-items: flex-start; }
+      .clock { text-align: left; }
+      .officer-card { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="title-wrap">
+        <h1>University Dispatch Console</h1>
+        <p>Online version with Supabase backend. Designed for deployment on your domain.</p>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button type="button" class="secondary" id="themeToggleBtn">Light Mode</button>
+        <div class="clock">
+          <div id="currentDate"></div>
+          <div id="currentTime"></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="panel">
+      <div class="panel-header">Connection Status</div>
+      <div class="panel-body">
+        <div id="statusBanner" class="banner warn show">Connecting...</div>
+        <div class="config-toolbar">
+          <input id="configStatus" type="text" value="Checking connection..." readonly />
+          <input id="connectedProject" type="text" value="Loading..." readonly />
+          <button type="button" class="secondary" id="refreshDataBtn">Refresh Data</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:18px;">
+      <div class="panel-header">Current Shift Board</div>
+      <div class="panel-body">
+        <div class="shift-toolbar">
+          <select id="currentShiftSelect">
+            <option value="07:00-15:00">7:00 AM - 3:00 PM</option>
+            <option value="15:00-23:00">3:00 PM - 11:00 PM</option>
+            <option value="23:00-07:00">11:00 PM - 7:00 AM</option>
+          </select>
+          <input id="currentShiftDate" type="date" />
+          <button type="button" class="primary" id="applyShiftBtn">Save Shift Board</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:18px;">
+      <div class="panel-header">Active Officers on Shift</div>
+      <div class="panel-body">
+        <div class="officer-toolbar">
+          <input id="officerNameInput" type="text" placeholder="Officer name" />
+          <input id="officerUnitInput" type="text" placeholder="Unit / radio" />
+          <input id="officerRoleInput" type="text" placeholder="Role" />
+          <select id="officerStatusInput">
+            <option>Available</option>
+            <option>Dispatched</option>
+            <option>En Route</option>
+            <option>On Scene</option>
+            <option>Meal</option>
+            <option>Out of Service</option>
+          </select>
+          <button class="primary" id="addOfficerBtn" type="button">Add Officer</button>
+        </div>
+        <div id="officerList" class="small">No active officers added yet.</div>
+      </div>
+    </section>
+
+    <div class="stats">
+      <div class="stat-card"><div class="label">Total Entries</div><div class="value" id="statTotal">0</div></div>
+      <div class="stat-card"><div class="label">Open Calls</div><div class="value" id="statOpen">0</div></div>
+      <div class="stat-card"><div class="label">High / Critical</div><div class="value" id="statPriority">0</div></div>
+      <div class="stat-card"><div class="label">Closed Calls</div><div class="value" id="statClosed">0</div></div>
+      <div class="stat-card"><div class="label">Officers Available</div><div class="value" id="statAvailable">0</div></div>
+    </div>
+
+    <div class="grid">
+      <section class="panel">
+        <div class="panel-header">New / Edit Call Entry</div>
+        <div class="panel-body">
+          <div class="small" style="margin-bottom:10px;">Quick common calls for a university campus:</div>
+          <div class="chip-row" id="quickCallButtons"></div>
+
+          <form id="entryForm">
+            <div class="form-grid">
+              <div class="field">
+                <label for="callNumber">Call Number</label>
+                <input id="callNumber" name="callNumber" type="text" placeholder="Auto-generated if blank" />
+              </div>
+              <div class="field">
+                <label for="callDateTime">Date / Time</label>
+                <input id="callDateTime" name="callDateTime" type="datetime-local" required />
+              </div>
+
+              <div class="field">
+                <label for="callShift">Shift</label>
+                <select id="callShift" name="callShift">
+                  <option value="07:00-15:00">7:00 AM - 3:00 PM</option>
+                  <option value="15:00-23:00">3:00 PM - 11:00 PM</option>
+                  <option value="23:00-07:00">11:00 PM - 7:00 AM</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="callShiftDate">Shift Date</label>
+                <input id="callShiftDate" name="callShiftDate" type="date" />
+              </div>
+
+              <div class="field full">
+                <label for="callType">Call Type</label>
+                <input id="callType" name="callType" type="text" placeholder="Suspicious Person, Medical, Alarm, Theft..." required />
+              </div>
+
+              <div class="field">
+                <label for="priority">Priority</label>
+                <select id="priority" name="priority">
+                  <option>Low</option>
+                  <option selected>Medium</option>
+                  <option>High</option>
+                  <option>Critical</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                  <option selected>Open</option>
+                  <option>Dispatched</option>
+                  <option>En Route</option>
+                  <option>On Scene</option>
+                  <option>Closed</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="callerName">Caller / Reporting Party</label>
+                <select id="callerName" name="callerName"></select>
+              </div>
+              <div class="field">
+                <label for="callerPhone">Phone</label>
+                <input id="callerPhone" name="callerPhone" type="text" placeholder="Phone Number" />
+              </div>
+
+              <div class="field full">
+                <label for="location">Location</label>
+                <input id="location" name="location" type="text" placeholder="Building, parking lot, address, area..." required />
+              </div>
+
+              <div class="field">
+                <label for="unitAssigned">Unit Assigned</label>
+                <select id="unitAssigned" name="unitAssigned"></select>
+              </div>
+              <div class="field">
+                <label for="dispatcher">Dispatcher / Operator</label>
+                <select id="dispatcher" name="dispatcher"></select>
+              </div>
+
+              <div class="field full">
+                <label for="notes">Narrative / Notes</label>
+                <textarea id="notes" name="notes" placeholder="Enter initial call details..."></textarea>
+              </div>
+            </div>
+
+            <div class="btn-row" style="margin-top:14px;">
+              <button type="submit" class="primary" id="saveBtn">Save Entry</button>
+              <button type="button" class="secondary" id="clearBtn">Clear Form</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">Active Log / Search</div>
+        <div class="toolbar">
+          <input id="searchInput" type="text" placeholder="Search call #, type, caller, location, unit, notes..." />
+          <input id="dateFilterInput" type="date" />
+          <select id="filterStatus">
+            <option value="">All Statuses</option>
+            <option>Open</option>
+            <option>Dispatched</option>
+            <option>En Route</option>
+            <option>On Scene</option>
+            <option>Closed</option>
+          </select>
+          <select id="filterPriority">
+            <option value="">All Priorities</option>
+            <option>Low</option>
+            <option>Medium</option>
+            <option>High</option>
+            <option>Critical</option>
+          </select>
+          <button class="secondary" id="exportBtn">Export JSON</button>
+          <button class="danger" id="clearAllBtn">Clear All</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Call #</th>
+                <th>Date / Time</th>
+                <th>Shift</th>
+                <th>Type</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Caller</th>
+                <th>Location</th>
+                <th>Unit</th>
+                <th>Dispatcher</th>
+                <th>Latest Note</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="entriesTableBody">
+              <tr><td colspan="12" class="empty">No entries yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel" style="margin-top:18px;">
+      <div class="panel-header">Shift Report Generator</div>
+      <div class="panel-body">
+        <div class="shift-toolbar">
+          <select id="shiftSelect">
+            <option value="07:00-15:00">7:00 AM - 3:00 PM</option>
+            <option value="15:00-23:00">3:00 PM - 11:00 PM</option>
+            <option value="23:00-07:00">11:00 PM - 7:00 AM</option>
+          </select>
+          <input id="shiftDate" type="date" />
+          <div class="btn-row">
+            <button class="primary" id="generateShiftReportBtn">Generate Report</button>
+            <button class="secondary" id="copyShiftReportBtn">Copy Report</button>
+            <button class="success" id="printShiftReportBtn">Print / PDF</button>
+          </div>
+        </div>
+        <textarea id="shiftReportOutput" placeholder="Your shift summary will appear here..." style="min-height:280px; margin-top:12px;"></textarea>
+      </div>
+    </section>
+
+    <div class="footer">University Dispatch Console • Online version</div>
+  </div>
+
+  <div class="modal-backdrop" id="auditBackdrop">
+    <div class="modal">
+      <div class="modal-head">
+        <strong>Entry Timeline / Audit</strong>
+        <div class="btn-row">
+          <button class="primary" id="addUpdateBtn">Add Update</button>
+          <button class="secondary" id="closeAuditBtn">Close</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div id="auditHeader" style="margin-bottom:12px;"></div>
+        <div id="auditContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const CONFIG = {
+      SUPABASE_URL: 'https://kjpxxetcefcvmbhtnzko.supabase.co',
+      SUPABASE_ANON_KEY: 'sb_publishable_VsTqashpyCyo07aQn8Y4qg_Z67Zdwz9'
+    };
+
+    const QUICK_CALLS = [
+      'Suspicious Person', 'Medical Assist', 'Fire Alarm', 'Burglary Alarm', 'Elevator Assist',
+      'Welfare Check', 'Student Conduct', 'Dorm Disturbance', 'Noise Complaint', 'Mental Health Crisis',
+      'Student Escort', 'Lockout / Unlock', 'Parking Complaint', 'Traffic Accident', 'Theft',
+      'Fight / Disorderly Conduct', 'Hazard / Safety Issue', 'Trespass', 'Found Property', 'Access Control / Door Issue'
+    ];
+
+    const supabaseReady = Boolean(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY);
+    const supabaseClient = supabaseReady ? window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY) : null;
+
+    const FORM = document.getElementById('entryForm');
+    const TABLE_BODY = document.getElementById('entriesTableBody');
+    const SEARCH = document.getElementById('searchInput');
+    const DATE_FILTER = document.getElementById('dateFilterInput');
+    const FILTER_STATUS = document.getElementById('filterStatus');
+    const FILTER_PRIORITY = document.getElementById('filterPriority');
+    const CLEAR_BTN = document.getElementById('clearBtn');
+    const CLEAR_ALL_BTN = document.getElementById('clearAllBtn');
+    const EXPORT_BTN = document.getElementById('exportBtn');
+    const THEME_TOGGLE_BTN = document.getElementById('themeToggleBtn');
+    const REFRESH_DATA_BTN = document.getElementById('refreshDataBtn');
+    const CONFIG_STATUS = document.getElementById('configStatus');
+    const CONNECTED_PROJECT = document.getElementById('connectedProject');
+    const STATUS_BANNER = document.getElementById('statusBanner');
+
+    const OFFICER_NAME_INPUT = document.getElementById('officerNameInput');
+    const OFFICER_UNIT_INPUT = document.getElementById('officerUnitInput');
+    const OFFICER_ROLE_INPUT = document.getElementById('officerRoleInput');
+    const OFFICER_STATUS_INPUT = document.getElementById('officerStatusInput');
+    const ADD_OFFICER_BTN = document.getElementById('addOfficerBtn');
+    const OFFICER_LIST = document.getElementById('officerList');
+
+    const CURRENT_SHIFT_SELECT = document.getElementById('currentShiftSelect');
+    const CURRENT_SHIFT_DATE = document.getElementById('currentShiftDate');
+    const APPLY_SHIFT_BTN = document.getElementById('applyShiftBtn');
+    const CALL_SHIFT = document.getElementById('callShift');
+    const CALL_SHIFT_DATE = document.getElementById('callShiftDate');
+
+    const SHIFT_SELECT = document.getElementById('shiftSelect');
+    const SHIFT_DATE = document.getElementById('shiftDate');
+    const SHIFT_REPORT_OUTPUT = document.getElementById('shiftReportOutput');
+    const GENERATE_SHIFT_REPORT_BTN = document.getElementById('generateShiftReportBtn');
+    const COPY_SHIFT_REPORT_BTN = document.getElementById('copyShiftReportBtn');
+    const PRINT_SHIFT_REPORT_BTN = document.getElementById('printShiftReportBtn');
+
+    const AUDIT_BACKDROP = document.getElementById('auditBackdrop');
+    const AUDIT_HEADER = document.getElementById('auditHeader');
+    const AUDIT_CONTENT = document.getElementById('auditContent');
+    const ADD_UPDATE_BTN = document.getElementById('addUpdateBtn');
+    const CLOSE_AUDIT_BTN = document.getElementById('closeAuditBtn');
+
+    let entries = [];
+    let activeOfficers = [];
+    let shiftBoard = { shift: '07:00-15:00', date: new Date().toISOString().slice(0, 10) };
+    let editingId = null;
+    let auditEntryId = null;
+
+    function setBanner(kind, message) {
+      STATUS_BANNER.className = 'banner show ' + kind;
+      STATUS_BANNER.textContent = message;
+    }
+
+    function nowLocalDateTimeInput() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+    }
+    function isoToDate(value) {
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return '';
+      return d.toISOString().slice(0, 10);
+    }
+    function updateClock() {
+      const d = new Date();
+      document.getElementById('currentDate').textContent = d.toLocaleDateString();
+      document.getElementById('currentTime').textContent = d.toLocaleTimeString();
+    }
+    function applyTheme(theme) {
+      if (theme === 'light') {
+        document.body.classList.add('light-mode');
+        THEME_TOGGLE_BTN.textContent = 'Dark Mode';
+      } else {
+        document.body.classList.remove('light-mode');
+        THEME_TOGGLE_BTN.textContent = 'Light Mode';
+      }
+      localStorage.setItem('dispatchThemeOnline', theme);
+    }
+    function formatDateTime(value) {
+      if (!value) return '';
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return String(value);
+      return d.toLocaleString();
+    }
+    function formatTimeOnly(value) {
+      if (!value) return '';
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return '';
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    function formatCallNumberDate(value) {
+      const d = value ? new Date(value) : new Date();
+      if (Number.isNaN(d.getTime())) return '';
+      const pad = n => String(n).padStart(2, '0');
+      return pad(d.getMonth() + 1) + '/' + pad(d.getDate()) + '/' + d.getFullYear();
+    }
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+    function createAudit(action, operator) {
+      return { timestamp: new Date().toISOString(), operator: operator || 'System', action };
+    }
+    function makeOfficerLabel(officer) {
+      let label = officer.name || '';
+      if (officer.unit) label += ' (' + officer.unit + ')';
+      if (officer.role) label += ' - ' + officer.role;
+      return label.trim();
+    }
+    function officerStatusClass(status) {
+      return 'officer-' + String(status).toLowerCase().replace(/\s+/g, '');
+    }
+    function priorityClass(priority) {
+      return 'priority-' + String(priority).toLowerCase();
+    }
+    function entryStatusClass(status) {
+      return 'status-' + String(status).toLowerCase().replace(/\s+/g, '');
+    }
+
+    function getNextCallSequence() {
+      let maxSequence = 0;
+      entries.forEach(entry => {
+        const match = String(entry.call_number || '').match(/-(\d+)$/);
+        if (match) {
+          const n = Number(match[1]);
+          if (!Number.isNaN(n) && n > maxSequence) maxSequence = n;
+        }
+      });
+      return maxSequence + 1;
+    }
+    function generateCallNumber(callDateTime) {
+      return formatCallNumberDate(callDateTime || nowLocalDateTimeInput()) + '-' + getNextCallSequence();
+    }
+
+    function fillOfficerSelect(selectEl, placeholder, keepValue) {
+      selectEl.innerHTML = '';
+      const first = document.createElement('option');
+      first.value = '';
+      first.textContent = placeholder;
+      selectEl.appendChild(first);
+
+      activeOfficers.forEach(officer => {
+        const option = document.createElement('option');
+        option.value = makeOfficerLabel(officer);
+        option.textContent = makeOfficerLabel(officer);
+        selectEl.appendChild(option);
+      });
+
+      if (keepValue && Array.from(selectEl.options).some(opt => opt.value === keepValue)) {
+        selectEl.value = keepValue;
+      }
+    }
+
+    function renderOfficerSelects() {
+      fillOfficerSelect(document.getElementById('callerName'), 'Select active officer / reporting party', document.getElementById('callerName').value);
+      fillOfficerSelect(document.getElementById('unitAssigned'), 'Select active officer / unit', document.getElementById('unitAssigned').value);
+      fillOfficerSelect(document.getElementById('dispatcher'), 'Select dispatcher / operator', document.getElementById('dispatcher').value);
+    }
+
+    function renderStats() {
+      document.getElementById('statTotal').textContent = entries.length;
+      document.getElementById('statOpen').textContent = entries.filter(e => e.status !== 'Closed').length;
+      document.getElementById('statPriority').textContent = entries.filter(e => e.priority === 'High' || e.priority === 'Critical').length;
+      document.getElementById('statClosed').textContent = entries.filter(e => e.status === 'Closed').length;
+      document.getElementById('statAvailable').textContent = activeOfficers.filter(o => (o.status || 'Available') === 'Available').length;
+    }
+
+    function renderOfficerList() {
+      if (!activeOfficers.length) {
+        OFFICER_LIST.innerHTML = 'No active officers added yet.';
+        renderOfficerSelects();
+        renderStats();
+        return;
+      }
+
+      OFFICER_LIST.innerHTML = activeOfficers.map(officer =>
+        '<div class="officer-card">' +
+          '<div>' +
+            '<strong>' + escapeHtml(officer.name) + '</strong>' +
+            '<div class="small">' + escapeHtml(officer.unit || '') + (officer.role ? ' • ' + escapeHtml(officer.role) : '') + '</div>' +
+            '<div style="margin-top:6px;"><span class="badge ' + officerStatusClass(officer.status || 'Available') + '">' + escapeHtml(officer.status || 'Available') + '</span></div>' +
+          '</div>' +
+          '<div class="btn-row">' +
+            '<button class="secondary" type="button" onclick="cycleOfficerStatus(\'' + officer.id + '\')">Change Status</button>' +
+            '<button class="danger" type="button" onclick="removeOfficer(\'' + officer.id + '\')">Remove</button>' +
+          '</div>' +
+        '</div>'
+      ).join('');
+
+      renderOfficerSelects();
+      renderStats();
+    }
+
+    function latestNarrative(entry) {
+      if (entry.timeline && entry.timeline.length) return entry.timeline[entry.timeline.length - 1].text || '';
+      return entry.notes || '';
+    }
+
+    function renderEntries() {
+      const q = SEARCH.value.trim().toLowerCase();
+      const s = FILTER_STATUS.value;
+      const p = FILTER_PRIORITY.value;
+      const dateOnly = DATE_FILTER.value;
+
+      const filtered = entries.filter(entry => {
+        const haystack = [
+          entry.call_number, entry.call_type, entry.priority, entry.status, entry.caller_name,
+          entry.caller_phone, entry.location, entry.unit_assigned, entry.dispatcher, latestNarrative(entry)
+        ].join(' ').toLowerCase();
+
+        const dateMatch = !dateOnly || isoToDate(entry.call_datetime) === dateOnly || String(entry.call_number || '').startsWith(formatCallNumberDate(dateOnly));
+        return (!q || haystack.includes(q)) && (!s || entry.status === s) && (!p || entry.priority === p) && dateMatch;
+      }).sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at));
+
+      if (!filtered.length) {
+        TABLE_BODY.innerHTML = '<tr><td colspan="12" class="empty">No matching entries found.</td></tr>';
+        renderStats();
+        return;
+      }
+
+      TABLE_BODY.innerHTML = filtered.map(entry => {
+        const notesText = escapeHtml(latestNarrative(entry)).slice(0, 180) + (latestNarrative(entry).length > 180 ? '...' : '');
+        const shiftLabel = entry.call_shift === '07:00-15:00' ? 'Day' : entry.call_shift === '15:00-23:00' ? 'Evening' : 'Night';
+
+        return '<tr>' +
+          '<td class="mono">' + escapeHtml(entry.call_number) + '</td>' +
+          '<td><strong>' + escapeHtml(formatDateTime(entry.call_datetime)) + '</strong><div class="small">Updated: ' + escapeHtml(formatDateTime(entry.updated_at)) + '</div></td>' +
+          '<td>' + escapeHtml(shiftLabel + ' • ' + (entry.call_shift_date || '')) + '</td>' +
+          '<td>' + escapeHtml(entry.call_type) + '</td>' +
+          '<td><span class="' + priorityClass(entry.priority) + '">' + escapeHtml(entry.priority) + '</span></td>' +
+          '<td><span class="badge ' + entryStatusClass(entry.status) + '">' + escapeHtml(entry.status) + '</span></td>' +
+          '<td>' + escapeHtml(entry.caller_name || '') + '<div class="small">' + escapeHtml(entry.caller_phone || '') + '</div></td>' +
+          '<td>' + escapeHtml(entry.location || '') + '</td>' +
+          '<td>' + escapeHtml(entry.unit_assigned || '') + '</td>' +
+          '<td>' + escapeHtml(entry.dispatcher || '') + '</td>' +
+          '<td class="notes-cell">' + notesText + '</td>' +
+          '<td><div class="btn-row">' +
+            '<button class="secondary" onclick="editEntry(\'' + entry.id + '\')">Edit</button>' +
+            '<button class="success" onclick="viewAudit(\'' + entry.id + '\')">Timeline</button>' +
+            '<button class="danger" onclick="deleteEntry(\'' + entry.id + '\')">Delete</button>' +
+          '</div></td>' +
+        '</tr>';
+      }).join('');
+
+      renderStats();
+    }
+
+    function renderQuickCallButtons() {
+      const wrap = document.getElementById('quickCallButtons');
+      wrap.innerHTML = QUICK_CALLS.map(call => '<button type="button" class="chip-btn" data-call="' + escapeHtml(call) + '">' + escapeHtml(call) + '</button>').join('');
+      wrap.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.getElementById('callType').value = this.getAttribute('data-call');
+        });
+      });
+    }
+
+    function setFormDefaults(forceDateTime) {
+      const dateTimeField = document.getElementById('callDateTime');
+      if (forceDateTime || !dateTimeField.value) dateTimeField.value = nowLocalDateTimeInput();
+      if (!document.getElementById('status').value) document.getElementById('status').value = 'Open';
+      if (!document.getElementById('priority').value) document.getElementById('priority').value = 'Medium';
+      CALL_SHIFT.value = shiftBoard.shift;
+      CALL_SHIFT_DATE.value = shiftBoard.date;
+      SHIFT_SELECT.value = shiftBoard.shift;
+      SHIFT_DATE.value = shiftBoard.date;
+      CURRENT_SHIFT_SELECT.value = shiftBoard.shift;
+      CURRENT_SHIFT_DATE.value = shiftBoard.date;
+    }
+
+    function resetForm() {
+      FORM.reset();
+      editingId = null;
+      document.getElementById('saveBtn').textContent = 'Save Entry';
+      renderOfficerSelects();
+      setFormDefaults(true);
+      document.getElementById('callType').focus();
+    }
+
+    function getFormData() {
+      const data = Object.fromEntries(new FormData(FORM).entries());
+      return {
+        call_number: (data.callNumber || '').trim() || generateCallNumber(data.callDateTime),
+        call_datetime: data.callDateTime || nowLocalDateTimeInput(),
+        call_shift: data.callShift || shiftBoard.shift,
+        call_shift_date: data.callShiftDate || shiftBoard.date,
+        call_type: (data.callType || '').trim(),
+        priority: data.priority || 'Medium',
+        status: data.status || 'Open',
+        caller_name: (data.callerName || '').trim(),
+        caller_phone: (data.callerPhone || '').trim(),
+        location: (data.location || '').trim(),
+        unit_assigned: (data.unitAssigned || '').trim(),
+        dispatcher: (data.dispatcher || '').trim(),
+        notes: (data.notes || '').trim(),
+        updated_at: new Date().toISOString()
+      };
+    }
+
+    async function loadAllData() {
+      if (!supabaseClient) {
+        setBanner('err', 'Supabase client not created.');
+        return;
+      }
+
+      CONFIG_STATUS.value = 'Loading online data...';
+      CONNECTED_PROJECT.value = CONFIG.SUPABASE_URL;
+
+      const [entriesRes, officersRes, settingsRes] = await Promise.all([
+        supabaseClient.from('dispatch_entries').select('*').order('updated_at', { ascending: false }),
+        supabaseClient.from('dispatch_officers').select('*').order('name', { ascending: true }),
+        supabaseClient.from('dispatch_settings').select('*').eq('key', 'shift_board').maybeSingle()
+      ]);
+
+      const firstError = entriesRes.error || officersRes.error || settingsRes.error;
+      if (firstError) {
+        CONFIG_STATUS.value = 'Connection error';
+        setBanner('err', firstError.message);
+        return;
+      }
+
+      entries = (entriesRes.data || []).map(entry => ({
+        ...entry,
+        timeline: Array.isArray(entry.timeline) ? entry.timeline : [],
+        audit: Array.isArray(entry.audit) ? entry.audit : []
+      }));
+      activeOfficers = officersRes.data || [];
+      if (settingsRes.data && settingsRes.data.value) shiftBoard = settingsRes.data.value;
+
+      setFormDefaults(true);
+      renderOfficerList();
+      renderEntries();
+
+      CONFIG_STATUS.value = 'Connected';
+      setBanner('ok', 'Connected to Supabase successfully.');
+    }
+
+    async function saveShiftBoardRemote() {
+      const payload = { shift: CURRENT_SHIFT_SELECT.value, date: CURRENT_SHIFT_DATE.value };
+      shiftBoard = payload;
+      const { error } = await supabaseClient
+        .from('dispatch_settings')
+        .upsert({ key: 'shift_board', value: payload }, { onConflict: 'key' });
+
+      if (error) return alert(error.message);
+
+      setFormDefaults(true);
+      alert('Shift board saved.');
+    }
+
+    async function upsertOfficerRemote(officer) {
+      const { error } = await supabaseClient.from('dispatch_officers').upsert(officer);
+      if (error) throw error;
+    }
+
+    async function deleteOfficerRemote(id) {
+      const { error } = await supabaseClient.from('dispatch_officers').delete().eq('id', id);
+      if (error) throw error;
+    }
+
+    async function updateEntryRemote(entry) {
+      const { error } = await supabaseClient.from('dispatch_entries').upsert(entry);
+      if (error) throw error;
+    }
+
+    async function deleteEntryRemote(id) {
+      const { error } = await supabaseClient.from('dispatch_entries').delete().eq('id', id);
+      if (error) throw error;
+    }
+
+    async function updateOfficerStatusByLabel(label, newStatus) {
+      if (!label) return;
+      const officer = activeOfficers.find(o => makeOfficerLabel(o) === label);
+      if (!officer) return;
+      officer.status = newStatus;
+      officer.updated_at = new Date().toISOString();
+      await upsertOfficerRemote(officer);
+    }
+
+    function generateShiftReport() {
+      const shiftValue = SHIFT_SELECT.value;
+      const selectedDate = SHIFT_DATE.value;
+      const [startTime, endTime] = shiftValue.split('-');
+      const start = new Date(selectedDate + 'T' + startTime + ':00');
+      const end = new Date(selectedDate + 'T' + endTime + ':00');
+      if (end <= start) end.setDate(end.getDate() + 1);
+
+      const shiftEntries = entries.filter(entry => {
+        const entryDate = new Date(entry.call_datetime);
+        return entryDate >= start && entryDate < end;
+      }).sort((a, b) => new Date(a.call_datetime) - new Date(b.call_datetime));
+
+      const officersInShift = activeOfficers.map(o => makeOfficerLabel(o) + ' - ' + (o.status || 'Available'));
+      const lines = [
+        'Shift Report',
+        'Date: ' + selectedDate,
+        'Shift: ' + shiftValue,
+        'Total Entries: ' + shiftEntries.length,
+        'Open Calls: ' + shiftEntries.filter(e => e.status !== 'Closed').length,
+        'High / Critical Calls: ' + shiftEntries.filter(e => e.priority === 'High' || e.priority === 'Critical').length,
+        '',
+        'Active Officers:',
+        officersInShift.length ? officersInShift.join('\n') : 'No officers listed.',
+        '',
+        'Entries:'
+      ];
+
+      if (!shiftEntries.length) {
+        lines.push('No entries found for this shift.');
+      } else {
+        shiftEntries.forEach((entry, index) => {
+          lines.push((index + 1) + '. Call #: ' + (entry.call_number || 'N/A'));
+          lines.push('   Dispatcher: ' + (entry.dispatcher || 'N/A'));
+          lines.push('   Dispatched: ' + (entry.unit_assigned || 'N/A'));
+          lines.push('   Time: ' + (formatTimeOnly(entry.call_datetime) || 'N/A'));
+          lines.push('   Type: ' + (entry.call_type || 'N/A'));
+          lines.push('   Status: ' + (entry.status || 'N/A'));
+          lines.push('   Narrative: ' + (latestNarrative(entry) || 'No narrative entered.'));
+          lines.push('');
+        });
+      }
+
+      SHIFT_REPORT_OUTPUT.value = lines.join('\n');
+    }
+
+    ADD_OFFICER_BTN.addEventListener('click', async function() {
+      if (!supabaseClient) return alert('Supabase is not connected.');
+      const name = OFFICER_NAME_INPUT.value.trim();
+      const unit = OFFICER_UNIT_INPUT.value.trim();
+      const role = OFFICER_ROLE_INPUT.value.trim();
+      const status = OFFICER_STATUS_INPUT.value;
+      if (!name) return alert('Please enter an officer name.');
+
+      const officer = {
+        id: crypto.randomUUID(),
+        name,
+        unit,
+        role,
+        status,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        await upsertOfficerRemote(officer);
+        OFFICER_NAME_INPUT.value = '';
+        OFFICER_UNIT_INPUT.value = '';
+        OFFICER_ROLE_INPUT.value = '';
+        OFFICER_STATUS_INPUT.value = 'Available';
+        await loadAllData();
+      } catch (e) {
+        alert(e.message);
+      }
+    });
+
+    window.removeOfficer = async function(id) {
+      try {
+        await deleteOfficerRemote(id);
+        await loadAllData();
+      } catch (e) {
+        alert(e.message);
+      }
+    };
+
+    window.cycleOfficerStatus = async function(id) {
+      const statuses = ['Available', 'Dispatched', 'En Route', 'On Scene', 'Meal', 'Out of Service'];
+      const officer = activeOfficers.find(o => o.id === id);
+      if (!officer) return;
+      const currentIndex = statuses.indexOf(officer.status || 'Available');
+      officer.status = statuses[(currentIndex + 1) % statuses.length];
+      officer.updated_at = new Date().toISOString();
+
+      try {
+        await upsertOfficerRemote(officer);
+        await loadAllData();
+      } catch (e) {
+        alert(e.message);
+      }
+    };
+
+    APPLY_SHIFT_BTN.addEventListener('click', saveShiftBoardRemote);
+
+    FORM.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      if (!supabaseClient) return alert('Supabase is not connected.');
+
+      const data = getFormData();
+      if (!data.call_type || !data.location) return alert('Please fill in at least Call Type and Location.');
+
+      try {
+        if (editingId) {
+          const old = entries.find(entry => entry.id === editingId);
+          if (!old) return;
+
+          const entry = {
+            ...old,
+            ...data,
+            id: editingId,
+            timeline: Array.isArray(old.timeline) ? old.timeline : [{ timestamp: old.created_at || new Date().toISOString(), operator: data.dispatcher || 'Unknown', text: old.notes || 'Entry created' }],
+            audit: (Array.isArray(old.audit) ? old.audit : []).concat([createAudit('Entry updated', data.dispatcher || 'Unknown')])
+          };
+
+          await updateEntryRemote(entry);
+        } else {
+          const entry = {
+            id: crypto.randomUUID(),
+            ...data,
+            created_at: new Date().toISOString(),
+            timeline: [{ timestamp: new Date().toISOString(), operator: data.dispatcher || 'Unknown', text: data.notes || 'Entry created' }],
+            audit: [createAudit('Entry created', data.dispatcher || 'Unknown')]
+          };
+
+          await updateEntryRemote(entry);
+        }
+
+        if (data.unit_assigned) {
+          await updateOfficerStatusByLabel(data.unit_assigned, data.status === 'Closed' ? 'Available' : data.status);
+        }
+
+        await loadAllData();
+        resetForm();
+      } catch (e) {
+        alert(e.message);
+      }
+    });
+
+    window.editEntry = function(id) {
+      const entry = entries.find(e => e.id === id);
+      if (!entry) return;
+
+      editingId = id;
+      renderOfficerSelects();
+      document.getElementById('callNumber').value = entry.call_number || '';
+      document.getElementById('callDateTime').value = (entry.call_datetime || '').slice(0, 16);
+      CALL_SHIFT.value = entry.call_shift || shiftBoard.shift;
+      CALL_SHIFT_DATE.value = entry.call_shift_date || shiftBoard.date;
+      document.getElementById('callType').value = entry.call_type || '';
+      document.getElementById('priority').value = entry.priority || 'Medium';
+      document.getElementById('status').value = entry.status || 'Open';
+      document.getElementById('callerName').value = entry.caller_name || '';
+      document.getElementById('callerPhone').value = entry.caller_phone || '';
+      document.getElementById('location').value = entry.location || '';
+      document.getElementById('unitAssigned').value = entry.unit_assigned || '';
+      document.getElementById('dispatcher').value = entry.dispatcher || '';
+      document.getElementById('notes').value = entry.notes || '';
+      document.getElementById('saveBtn').textContent = 'Update Entry';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.deleteEntry = async function(id) {
+      if (!confirm('Delete this entry?')) return;
+      try {
+        await deleteEntryRemote(id);
+        await loadAllData();
+        if (editingId === id) resetForm();
+      } catch (e) {
+        alert(e.message);
+      }
+    };
+
+    window.viewAudit = function(id) {
+      const entry = entries.find(e => e.id === id);
+      if (!entry) return;
+
+      auditEntryId = id;
+      AUDIT_HEADER.innerHTML =
+        '<div><strong>Call #:</strong> ' + escapeHtml(entry.call_number) + '</div>' +
+        '<div><strong>Type:</strong> ' + escapeHtml(entry.call_type) + '</div>' +
+        '<div><strong>Location:</strong> ' + escapeHtml(entry.location) + '</div>';
+
+      const timeline = Array.isArray(entry.timeline) ? entry.timeline : [];
+      AUDIT_CONTENT.innerHTML = timeline.length
+        ? timeline.map(item =>
+            '<div class="timeline-item">' +
+              '<div><strong>' + escapeHtml(item.text) + '</strong></div>' +
+              '<div class="small">' + escapeHtml(formatDateTime(item.timestamp)) + ' • ' + escapeHtml(item.operator || 'System') + '</div>' +
+            '</div>'
+          ).join('')
+        : '<div class="small">No timeline entries.</div>';
+
+      AUDIT_BACKDROP.classList.add('show');
+    };
+
+    ADD_UPDATE_BTN.addEventListener('click', async function() {
+      if (!auditEntryId) return;
+      const entry = entries.find(e => e.id === auditEntryId);
+      if (!entry) return;
+
+      const operator = prompt('Dispatcher / operator name for this update:', entry.dispatcher || '');
+      if (operator === null) return;
+      const text = prompt('Timeline update / narrative:');
+      if (!text) return;
+
+      entry.timeline = Array.isArray(entry.timeline) ? entry.timeline : [];
+      entry.timeline.push({ timestamp: new Date().toISOString(), operator: operator || 'Unknown', text });
+      entry.notes = text;
+      entry.updated_at = new Date().toISOString();
+      entry.audit = (Array.isArray(entry.audit) ? entry.audit : []).concat([createAudit('Timeline update added', operator || 'Unknown')]);
+
+      try {
+        await updateEntryRemote(entry);
+        await loadAllData();
+        window.viewAudit(auditEntryId);
+      } catch (e) {
+        alert(e.message);
+      }
+    });
+
+    CLOSE_AUDIT_BTN.addEventListener('click', function() { AUDIT_BACKDROP.classList.remove('show'); });
+    AUDIT_BACKDROP.addEventListener('click', function(e) { if (e.target === AUDIT_BACKDROP) AUDIT_BACKDROP.classList.remove('show'); });
+    CLEAR_BTN.addEventListener('click', resetForm);
+
+    CLEAR_ALL_BTN.addEventListener('click', async function() {
+      if (!confirm('This will remove all online dispatch entries. Continue?')) return;
+      const { error } = await supabaseClient.from('dispatch_entries').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      if (error) return alert(error.message);
+      await loadAllData();
+      resetForm();
+    });
+
+    EXPORT_BTN.addEventListener('click', function() {
+      const blob = new Blob([JSON.stringify({ entries, activeOfficers, shiftBoard }, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'dispatch-export-' + new Date().toISOString().slice(0, 10) + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    GENERATE_SHIFT_REPORT_BTN.addEventListener('click', generateShiftReport);
+    COPY_SHIFT_REPORT_BTN.addEventListener('click', async function() {
+      const text = SHIFT_REPORT_OUTPUT.value.trim();
+      if (!text) return alert('Generate a shift report first.');
+
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        SHIFT_REPORT_OUTPUT.select();
+        document.execCommand('copy');
+      }
+      alert('Shift report copied to clipboard.');
+    });
+
+    PRINT_SHIFT_REPORT_BTN.addEventListener('click', function() {
+      const text = SHIFT_REPORT_OUTPUT.value.trim();
+      if (!text) return alert('Generate a shift report first.');
+      const win = window.open('', '_blank');
+      win.document.write('<pre style="font-family:Arial; white-space:pre-wrap;">' + escapeHtml(text) + '</pre>');
+      win.document.close();
+      win.focus();
+      win.print();
+    });
+
+    THEME_TOGGLE_BTN.addEventListener('click', function() {
+      applyTheme(document.body.classList.contains('light-mode') ? 'dark' : 'light');
+    });
+
+    REFRESH_DATA_BTN.addEventListener('click', loadAllData);
+    SEARCH.addEventListener('input', renderEntries);
+    DATE_FILTER.addEventListener('change', renderEntries);
+    FILTER_STATUS.addEventListener('change', renderEntries);
+    FILTER_PRIORITY.addEventListener('change', renderEntries);
+
+    function initUi() {
+      renderQuickCallButtons();
+      applyTheme(localStorage.getItem('dispatchThemeOnline') || 'dark');
+      updateClock();
+      setInterval(updateClock, 1000);
+      setFormDefaults(true);
+      renderOfficerSelects();
+      renderStats();
+    }
+
+    initUi();
+
+    if (!supabaseReady || !supabaseClient) {
+      CONFIG_STATUS.value = 'Missing configuration';
+      CONNECTED_PROJECT.value = 'Not connected';
+      setBanner('err', 'Supabase configuration is missing or invalid.');
+    } else {
+      CONFIG_STATUS.value = 'Connecting...';
+      CONNECTED_PROJECT.value = CONFIG.SUPABASE_URL;
+      loadAllData();
+    }
+  </script>
+</body>
+</html>
