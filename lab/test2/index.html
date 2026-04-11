@@ -7,45 +7,49 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #eef2f7;
-      --bg-2: #e6ebf3;
-      --panel: rgba(255, 255, 255, 0.74);
-      --panel-strong: rgba(255, 255, 255, 0.92);
-      --panel-soft: rgba(255, 255, 255, 0.52);
-      --text: #1d2433;
-      --muted: #6f7b91;
-      --accent: #ff7a45;
-      --accent-2: #5f8dff;
-      --border: rgba(255, 255, 255, 0.55);
-      --shadow: 0 10px 30px rgba(73, 89, 120, 0.10);
-      --shadow-strong: 0 18px 45px rgba(73, 89, 120, 0.16);
-      --danger: #d84f67;
-      --warn: #e5a432;
-      --ok: #4ea66c;
-      --fresh: linear-gradient(135deg, #edf4ff 0%, #dce8ff 100%);
-      --aging: linear-gradient(135deg, #fff7dd 0%, #ffe9b0 100%);
-      --fading: linear-gradient(135deg, #ffe5dc 0%, #ffc8b6 100%);
+      --bg: #f5f7fb;
+      --bg-2: #eef2f7;
+      --panel: #ffffff;
+      --panel-strong: #ffffff;
+      --panel-soft: #f8fafc;
+      --text: #18212f;
+      --muted: #64748b;
+      --accent: #4f7cff;
+      --accent-2: #3c67ea;
+      --border: #dbe4f0;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      --shadow-strong: 0 14px 34px rgba(15, 23, 42, 0.12);
+      --danger: #d14d68;
+      --warn: #d48a1c;
+      --ok: #2f9b51;
+      --fresh: #ffffff;
+      --aging: #fff7db;
+      --fading: #ffe7df;
+      --pill-bg: #f3f6fb;
+      --handle-bg: #f3f6fb;
     }
 
     body.dark {
-      --bg: #111826;
-      --bg-2: #0d1420;
-      --panel: rgba(24, 34, 51, 0.74);
-      --panel-strong: rgba(27, 39, 58, 0.92);
-      --panel-soft: rgba(31, 43, 63, 0.50);
-      --text: #edf2ff;
-      --muted: #9eacc8;
-      --accent: #ff8b57;
-      --accent-2: #7da0ff;
-      --border: rgba(255, 255, 255, 0.09);
-      --shadow: 0 18px 40px rgba(0, 0, 0, 0.30);
-      --shadow-strong: 0 24px 50px rgba(0, 0, 0, 0.42);
+      --bg: #0f1724;
+      --bg-2: #0b1220;
+      --panel: #141d2b;
+      --panel-strong: #182235;
+      --panel-soft: #101827;
+      --text: #e7eefc;
+      --muted: #95a6c6;
+      --accent: #7aa2ff;
+      --accent-2: #5d88ff;
+      --border: #243146;
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.26);
+      --shadow-strong: 0 18px 40px rgba(0, 0, 0, 0.38);
       --danger: #ff7a90;
-      --warn: #ffc262;
-      --ok: #7fd59a;
-      --fresh: linear-gradient(135deg, rgba(71, 106, 173, 0.50) 0%, rgba(86, 127, 214, 0.38) 100%);
-      --aging: linear-gradient(135deg, rgba(164, 120, 33, 0.46) 0%, rgba(209, 158, 55, 0.34) 100%);
-      --fading: linear-gradient(135deg, rgba(171, 84, 59, 0.52) 0%, rgba(214, 114, 85, 0.34) 100%);
+      --warn: #ffbf52;
+      --ok: #7bd88f;
+      --fresh: #162033;
+      --aging: #332a18;
+      --fading: #3a231d;
+      --pill-bg: #1a2436;
+      --handle-bg: #1a2436;
     }
 
     * {
@@ -58,19 +62,11 @@
       min-height: 100vh;
       font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text);
-      background:
-        radial-gradient(circle at 12% 10%, rgba(255, 255, 255, 0.85), transparent 22%),
-        radial-gradient(circle at 88% 14%, rgba(255, 180, 145, 0.34), transparent 20%),
-        radial-gradient(circle at 50% 100%, rgba(95, 141, 255, 0.10), transparent 24%),
-        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
     }
 
-    body.dark {
-      background:
-        radial-gradient(circle at 10% 12%, rgba(125, 160, 255, 0.10), transparent 20%),
-        radial-gradient(circle at 88% 10%, rgba(255, 139, 87, 0.13), transparent 18%),
-        radial-gradient(circle at 50% 100%, rgba(125, 160, 255, 0.08), transparent 24%),
-        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+    body {
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     .wrap {
@@ -100,16 +96,13 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 9px 12px;
+      padding: 8px 12px;
       border: 1px solid var(--border);
       background: var(--panel-soft);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
       border-radius: 999px;
       color: var(--muted);
       font-size: 12px;
       margin-bottom: 10px;
-      box-shadow: var(--shadow);
     }
 
     h1 {
@@ -134,8 +127,6 @@
       border: 1px solid var(--border);
       border-radius: 50%;
       background: var(--panel);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
       color: var(--text);
       box-shadow: var(--shadow);
       display: inline-flex;
@@ -154,10 +145,8 @@
 
     .card {
       background: var(--panel);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--border);
-      border-radius: 28px;
+      border-radius: 24px;
       box-shadow: var(--shadow);
       overflow: hidden;
     }
@@ -192,17 +181,10 @@
       border: 1px solid var(--border);
       background: var(--panel-strong);
       color: var(--text);
-      border-radius: 20px;
+      border-radius: 16px;
       padding: 14px 15px;
       font-size: 16px;
       outline: none;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
-    }
-
-    body.dark textarea,
-    body.dark select,
-    body.dark input {
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
     }
 
     textarea {
@@ -212,8 +194,14 @@
     }
 
     textarea:focus, select:focus, input:focus {
-      border-color: rgba(95, 141, 255, 0.45);
-      box-shadow: 0 0 0 4px rgba(95, 141, 255, 0.10);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(79, 124, 255, 0.12);
+    }
+
+    body.dark textarea:focus,
+    body.dark select:focus,
+    body.dark input:focus {
+      box-shadow: 0 0 0 4px rgba(122, 162, 255, 0.14);
     }
 
     .row {
@@ -231,7 +219,7 @@
 
     button {
       border: 0;
-      border-radius: 18px;
+      border-radius: 16px;
       padding: 13px 14px;
       font-size: 15px;
       min-height: 50px;
@@ -250,10 +238,10 @@
     }
 
     .primary {
-      background: linear-gradient(135deg, var(--accent) 0%, #ff9968 100%);
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
       color: white;
       font-weight: 700;
-      box-shadow: 0 10px 24px rgba(255, 122, 69, 0.25);
+      box-shadow: 0 10px 22px rgba(79, 124, 255, 0.24);
     }
 
     .secondary {
@@ -272,15 +260,16 @@
     }
 
     .flag-button.active {
-      background: linear-gradient(135deg, #fff3d8 0%, #ffe7aa 100%);
-      color: #cb8a10;
-      border: 1px solid rgba(229, 164, 50, 0.26);
-      box-shadow: 0 10px 24px rgba(229, 164, 50, 0.16);
+      background: linear-gradient(135deg, #ffe6a3 0%, #ffd36a 100%);
+      color: #7a4e00;
+      border: 1px solid #f2c14e;
+      box-shadow: 0 10px 22px rgba(212, 138, 28, 0.22);
     }
 
     body.dark .flag-button.active {
-      background: linear-gradient(135deg, rgba(164, 120, 33, 0.46) 0%, rgba(209, 158, 55, 0.32) 100%);
-      color: #ffd37d;
+      background: linear-gradient(135deg, #6b4d11 0%, #8a6615 100%);
+      color: #ffe08a;
+      border-color: #9c7418;
     }
 
     .list-head {
@@ -307,17 +296,16 @@
       text-align: center;
       color: var(--muted);
       border: 1px dashed var(--border);
-      border-radius: 22px;
+      border-radius: 18px;
       background: var(--panel-soft);
-      backdrop-filter: blur(16px);
       line-height: 1.45;
       font-size: 15px;
     }
 
     .note {
       background: var(--fresh);
-      border: 1px solid rgba(255,255,255,0.42);
-      border-radius: 24px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
       padding: 15px;
       transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.35s ease, filter 0.35s ease;
       box-shadow: var(--shadow);
@@ -337,7 +325,7 @@
     }
 
     .note.flagged {
-      box-shadow: 0 16px 36px rgba(229, 164, 50, 0.16);
+      box-shadow: var(--shadow), 0 0 0 2px rgba(212, 138, 28, 0.2);
     }
 
     .note.dragging {
@@ -372,28 +360,23 @@
       font-size: 12px;
       border-radius: 999px;
       padding: 7px 10px;
-      background: rgba(255, 255, 255, 0.62);
+      background: var(--pill-bg);
       color: var(--muted);
-      border: 1px solid rgba(255,255,255,0.46);
+      border: 1px solid var(--border);
       white-space: nowrap;
-      backdrop-filter: blur(10px);
-    }
-
-    body.dark .pill {
-      background: rgba(17, 26, 43, 0.42);
-      border-color: rgba(255,255,255,0.08);
     }
 
     .pill.flag {
       color: #9a6710;
-      background: rgba(255, 243, 216, 0.88);
-      border-color: rgba(229, 164, 50, 0.28);
+      background: #fff1c7;
+      border-color: #f1d07a;
       font-weight: 700;
     }
 
     body.dark .pill.flag {
       color: #ffd37d;
-      background: rgba(164, 120, 33, 0.34);
+      background: #3d2d0f;
+      border-color: #614713;
     }
 
     .meta {
@@ -419,16 +402,11 @@
     .tiny {
       padding: 9px 11px;
       font-size: 13px;
-      border-radius: 14px;
+      border-radius: 12px;
       min-height: 40px;
-      background: rgba(255, 255, 255, 0.56);
-      border: 1px solid rgba(255,255,255,0.48);
+      background: var(--panel-strong);
+      border: 1px solid var(--border);
       color: var(--text);
-    }
-
-    body.dark .tiny {
-      background: rgba(17, 26, 43, 0.35);
-      border-color: rgba(255,255,255,0.08);
     }
 
     .tiny.danger {
@@ -447,9 +425,9 @@
       width: 34px;
       min-width: 34px;
       height: 34px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.42);
-      background: rgba(255,255,255,0.50);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--handle-bg);
       color: var(--muted);
       display: inline-flex;
       align-items: center;
@@ -458,12 +436,6 @@
       cursor: grab;
       touch-action: none;
       user-select: none;
-      backdrop-filter: blur(10px);
-    }
-
-    body.dark .note-handle {
-      background: rgba(17, 26, 43, 0.35);
-      border-color: rgba(255,255,255,0.08);
     }
 
     .note-handle:active {
@@ -540,9 +512,9 @@
   <main class="wrap">
     <section class="hero">
       <div class="hero-left">
-        <div class="badge">FadeNotes Lab · soft card theme</div>
+        <div class="badge">FadeNotes Lab · simple theme</div>
         <h1>Notes that expire on purpose.</h1>
-        <p class="sub">Soft floating cards, clean mobile spacing, and notes that visually fade away as expiration gets closer.</p>
+        <p class="sub">Simple light and dark themes, clean spacing, and notes that visually fade as expiration gets closer.</p>
       </div>
       <div class="hero-right">
         <button class="theme-toggle" id="themeToggle" aria-label="Switch to light mode" title="Switch to light mode">☀️</button>
