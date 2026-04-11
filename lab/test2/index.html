@@ -16,8 +16,8 @@
   --border:#e1e6ee;
   --flag:#ef9a9a;
   --flag-soft:rgba(239,154,154,0.16);
-  --favorite:#7da7ff;
-  --favorite-soft:rgba(125,167,255,0.16);
+  --favorite:#d8a93a;
+  --favorite-soft:rgba(216,169,58,0.18);
   --button:#2f2f33;
   --button-text:#ffffff;
   --fresh:#ffffff;
@@ -30,340 +30,136 @@
 
 body.dark{
   --bg:#15171b;
-  --panel:#1f242b;
-  --panel-2:#262c35;
-  --note-base:#2b313b;
+  --panel:#1d2229;
+  --panel-2:#252b34;
+  --note-base:#343b47;
   --text:#f2f4f7;
   --muted:#a1a8b3;
-  --border:#343a44;
-  --flag:#ffaaaa;
-  --flag-soft:rgba(255,170,170,0.12);
-  --favorite:#9bb1ff;
-  --favorite-soft:rgba(155,177,255,0.14);
+  --border:#404755;
+  --flag:#ffb1b1;
+  --flag-soft:rgba(255,177,177,0.12);
+  --favorite:#f1c75b;
+  --favorite-soft:rgba(241,199,91,0.16);
   --button:#f2f4f7;
   --button-text:#15171b;
-  --fresh:#2b313b;
-  --aging:#3a3428;
-  --fading:#3b2f31;
+  --fresh:#343b47;
+  --aging:#4a412d;
+  --fading:#4a3537;
   --shadow:0 12px 30px rgba(0,0,0,0.34);
   --shadow-strong:0 18px 38px rgba(0,0,0,0.42);
   --note-shadow:0 10px 22px rgba(0,0,0,0.28);
 }
 
 *{box-sizing:border-box}
-
-html,body{
-  margin:0;
-  min-height:100vh;
-}
-
+html,body{margin:0;min-height:100vh}
 body{
   font-family:"Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:var(--bg);
   color:var(--text);
   transition:background .2s ease,color .2s ease;
 }
-
-.wrap{
-  max-width:940px;
-  margin:auto;
-  padding:20px;
-}
-
-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:20px;
-}
-
-h1{
-  margin:0;
-  font-size:28px;
-  letter-spacing:-0.03em;
-}
-
+.wrap{max-width:940px;margin:auto;padding:20px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+h1{margin:0;font-size:28px;letter-spacing:-0.03em}
 .theme-toggle{
-  cursor:pointer;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  font-size:22px;
-  line-height:1;
-  background:var(--note-base);
-  color:var(--text);
-  border:1px solid var(--border);
-  border-radius:14px;
-  width:52px;
-  height:52px;
-  box-shadow:var(--shadow);
-  padding:0;
+  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+  font-size:22px;line-height:1;background:var(--note-base);color:var(--text);
+  border:1px solid var(--border);border-radius:14px;width:52px;height:52px;
+  box-shadow:var(--shadow);padding:0;
 }
-
-.grid{
-  display:grid;
-  grid-template-columns:320px 1fr;
-  gap:20px;
-}
-
+.grid{display:grid;grid-template-columns:320px 1fr;gap:20px}
 .card{
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:16px;
-  box-shadow:var(--shadow);
+  background:var(--panel);border:1px solid var(--border);border-radius:18px;
+  padding:16px;box-shadow:var(--shadow);
 }
-
 textarea{
-  width:100%;
-  min-height:170px;
-  padding:14px;
-  border-radius:14px;
-  border:1px solid var(--border);
-  background:var(--note-base);
-  color:var(--text);
-  resize:vertical;
-  outline:none;
+  width:100%;min-height:170px;padding:14px;border-radius:14px;border:1px solid var(--border);
+  background:var(--note-base);color:var(--text);resize:vertical;outline:none;
   font:500 15px/1.5 "Inter",system-ui,sans-serif;
 }
-
 textarea::placeholder{
-  font:500 16px/1.5 "Inter",system-ui,sans-serif;
-  color:var(--muted);
-  opacity:.9;
+  font:500 16px/1.5 "Inter",system-ui,sans-serif;color:var(--muted);opacity:.9;
 }
-
 select,input{
-  width:100%;
-  padding:12px 14px;
-  border-radius:14px;
-  border:1px solid var(--border);
-  background:var(--note-base);
-  color:var(--text);
-  outline:none;
+  width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--border);
+  background:var(--note-base);color:var(--text);outline:none;
   font:500 15px/1.2 "Inter",system-ui,sans-serif;
 }
-
 textarea:focus,select:focus,input:focus{
-  border-color:#7b8aa0;
-  box-shadow:0 0 0 4px rgba(123,138,160,0.10);
+  border-color:#7b8aa0;box-shadow:0 0 0 4px rgba(123,138,160,0.10);
 }
-
-.row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:10px;
-}
-
-.actions{
-  display:grid;
-  grid-template-columns:repeat(3, 1fr);
-  gap:12px;
-  margin-top:14px;
-}
-
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
 button{
-  padding:12px 16px;
-  border-radius:14px;
-  border:none;
-  cursor:pointer;
+  padding:12px 16px;border-radius:14px;border:none;cursor:pointer;
   font:600 15px/1 "Inter",system-ui,sans-serif;
   transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
 }
-
-button:hover{
-  transform:translateY(-1px);
-}
-
-button:active{
-  transform:translateY(0);
-}
-
+button:hover{transform:translateY(-1px)}
+button:active{transform:translateY(0)}
 .primary{
-  background:var(--button);
-  color:var(--button-text);
-  font-weight:700;
-  min-height:50px;
-  width:100%;
+  background:var(--button);color:var(--button-text);font-weight:700;min-height:50px;width:100%;
   box-shadow:0 8px 20px rgba(0,0,0,0.14);
 }
-
 .icon-button{
-  min-height:50px;
-  width:100%;
-  font-size:20px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  background:var(--note-base);
-  color:var(--text);
-  border:1px solid var(--border);
-  box-shadow:0 6px 16px rgba(0,0,0,0.08);
-  padding:0;
+  min-height:50px;width:100%;font-size:20px;display:inline-flex;align-items:center;justify-content:center;
+  background:var(--note-base);color:var(--text);border:1px solid var(--border);
+  box-shadow:0 6px 16px rgba(0,0,0,0.08);padding:0;
 }
-
 .flag-button.active{
-  border:1px solid var(--flag);
-  color:var(--flag);
-  background:var(--panel-2);
+  border:1px solid var(--flag);color:var(--flag);background:var(--panel-2);
   box-shadow:0 0 0 3px var(--flag-soft), 0 8px 18px rgba(0,0,0,0.10);
 }
-
 .favorite-button.active{
-  border:1px solid var(--favorite);
-  color:var(--favorite);
-  background:var(--panel-2);
+  border:1px solid var(--favorite);color:var(--favorite);background:var(--panel-2);
   box-shadow:0 0 0 3px var(--favorite-soft), 0 8px 18px rgba(0,0,0,0.10);
 }
-
-.summary{
-  margin:0 0 12px;
-  color:var(--muted);
-  font-size:14px;
-}
-
-.note-list{
-  display:grid;
-  gap:12px;
-}
-
-.empty{
-  color:var(--muted);
-  padding:10px 0;
-}
-
+.summary{margin:0 0 12px;color:var(--muted);font-size:14px}
+.note-list{display:grid;gap:12px}
+.empty{color:var(--muted);padding:10px 0}
 .note{
-  padding:16px;
-  border-radius:16px;
-  border:1px solid var(--border);
-  background:var(--fresh);
+  padding:16px;border-radius:16px;border:1px solid var(--border);background:var(--fresh);
   transition:opacity .35s ease, transform .25s ease, box-shadow .25s ease, background .25s ease, border-color .25s ease;
   box-shadow:var(--note-shadow);
 }
-
-.note:hover{
-  transform:translateY(-2px);
-  box-shadow:var(--shadow-strong);
-}
-
+.note:hover{transform:translateY(-2px);box-shadow:var(--shadow-strong)}
 .note-aging{background:var(--aging)}
 .note-fading{background:var(--fading)}
-
 .note.flagged{
   border:1px solid var(--flag);
   box-shadow:0 0 0 2px var(--flag-soft), var(--note-shadow);
 }
-
 .note.favorite{
   box-shadow:0 0 0 2px var(--favorite-soft), var(--note-shadow);
 }
-
 .note.flagged.favorite{
   box-shadow:0 0 0 2px var(--flag-soft), 0 0 0 4px var(--favorite-soft), var(--note-shadow);
 }
-
-.note-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:10px;
-}
-
-.note-badges{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-bottom:8px;
-}
-
+.note-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.note-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .badge{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  font-size:12px;
-  font-weight:600;
-  padding:6px 10px;
-  border-radius:999px;
-  background:var(--panel-2);
-  border:1px solid var(--border);
-  color:var(--muted);
+  display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:6px 10px;
+  border-radius:999px;background:var(--panel-2);border:1px solid var(--border);color:var(--muted);
 }
-
-.badge.flagged{
-  color:var(--flag);
-  border-color:var(--flag-soft);
-}
-
-.badge.favorite{
-  color:var(--favorite);
-  border-color:var(--favorite-soft);
-}
-
-.note-text{
-  margin:0 0 10px;
-  white-space:pre-wrap;
-  word-break:break-word;
-  font-size:15px;
-  line-height:1.55;
-}
-
+.badge.flagged{color:var(--flag);border-color:var(--flag-soft)}
+.badge.favorite{color:var(--favorite);border-color:var(--favorite-soft)}
+.note-text{margin:0 0 10px;white-space:pre-wrap;word-break:break-word;font-size:15px;line-height:1.55}
 .meta{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  margin-top:8px;
-  font-size:12px;
-  color:var(--muted);
-  flex-wrap:wrap;
+  display:flex;justify-content:space-between;gap:10px;margin-top:8px;font-size:12px;color:var(--muted);flex-wrap:wrap;
 }
-
-.note-actions{
-  display:flex;
-  gap:8px;
-  margin-top:12px;
-  flex-wrap:wrap;
-}
-
+.note-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 .note-actions button{
-  font-size:13px;
-  padding:10px 12px;
-  min-height:40px;
-  background:var(--panel-2);
-  color:var(--text);
-  border:1px solid var(--border);
-  border-radius:12px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.06);
+  font-size:13px;padding:10px 12px;min-height:40px;background:var(--panel-2);color:var(--text);
+  border:1px solid var(--border);border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.06);
 }
-
-.note-actions button:hover{
-  box-shadow:0 8px 18px rgba(0,0,0,0.10);
-}
-
+.note-actions button:hover{box-shadow:0 8px 18px rgba(0,0,0,0.10)}
 .note-handle{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:34px;
-  height:34px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  background:var(--panel-2);
-  color:var(--muted);
-  cursor:grab;
-  user-select:none;
-  touch-action:none;
+  display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:12px;
+  border:1px solid var(--border);background:var(--panel-2);color:var(--muted);cursor:grab;user-select:none;touch-action:none;
   box-shadow:0 4px 10px rgba(0,0,0,0.06);
 }
-
-.note-handle:active{
-  cursor:grabbing;
-}
-
-@media(max-width:800px){
-  .grid{grid-template-columns:1fr}
-}
-
+.note-handle:active{cursor:grabbing}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
 @media(max-width:520px){
   .wrap{padding:14px}
   .actions{gap:10px}
@@ -373,7 +169,6 @@ button:active{
 </style>
 </head>
 <body>
-
 <div class="wrap">
   <header>
     <h1>FadeNotes</h1>
@@ -383,7 +178,6 @@ button:active{
   <div class="grid">
     <div class="card">
       <textarea id="noteText" placeholder="Write temporary note..."></textarea>
-
       <div class="row">
         <select id="preset">
           <option value="1">1 hour</option>
@@ -396,7 +190,6 @@ button:active{
         </select>
         <input id="customHours" type="number" min="1" step="1" placeholder="Custom hours" disabled>
       </div>
-
       <div class="actions">
         <button class="primary" id="addBtn" type="button">Save</button>
         <button class="icon-button flag-button" id="importantBtn" type="button" aria-pressed="false" title="Flag note">⚑</button>
@@ -427,61 +220,40 @@ const summary=document.getElementById('summary');
 const themeToggle=document.getElementById('themeToggle');
 
 function loadNotes(){
-  try{
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
-  }catch{
-    return [];
-  }
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}
+  catch{return [];}
 }
-
-function saveNotes(notes){
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(notes));
-}
-
+function saveNotes(notes){localStorage.setItem(STORAGE_KEY,JSON.stringify(notes));}
 function createNote(text,hours,flagged,favorite){
   const now=Date.now();
-  return {
-    id:crypto.randomUUID(),
-    text,
-    flagged,
-    favorite,
-    createdAt:now,
-    expiresAt:now + hours*3600000,
-    order:now
-  };
+  return {id:crypto.randomUUID(),text,flagged,favorite,createdAt:now,expiresAt:now+hours*3600000,order:now};
 }
-
 function removeExpired(notes){
   const now=Date.now();
   return notes.filter(note=>note.expiresAt>now);
 }
-
 function getHours(){
   if(preset.value==='custom'){
     const v=Number(customHours.value);
-    return Number.isFinite(v) && v>0 ? v : null;
+    return Number.isFinite(v)&&v>0?v:null;
   }
   return Number(preset.value);
 }
-
 function progress(note){
   const total=Math.max(1,note.expiresAt-note.createdAt);
   const left=note.expiresAt-Date.now();
   return Math.max(0,Math.min(1,left/total));
 }
-
 function opacity(note){
   const r=progress(note);
   return 0.22 + r*0.78;
 }
-
 function themeClass(note){
   const r=progress(note);
   if(r>0.6) return '';
   if(r>0.25) return 'note-aging';
   return 'note-fading';
 }
-
 function formatLeft(ms){
   if(ms<=0) return 'expired';
   const mins=Math.floor(ms/60000);
@@ -492,20 +264,12 @@ function formatLeft(ms){
   if(hours>0) return `${hours}h ${minutes}m left`;
   return `${minutes}m left`;
 }
-
 function escapeHtml(text){
-  return text
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;')
-    .replace(/'/g,'&#039;');
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
-
 function render(){
   let notes=removeExpired(loadNotes());
   saveNotes(notes);
-
   notes.sort((a,b)=>{
     if(Boolean(a.favorite)!==Boolean(b.favorite)) return a.favorite ? -1 : 1;
     return (a.order??0)-(b.order??0);
@@ -513,7 +277,7 @@ function render(){
 
   const flaggedCount=notes.filter(n=>n.flagged).length;
   const favoriteCount=notes.filter(n=>n.favorite).length;
-  summary.textContent = `${notes.length} active note${notes.length===1?'':'s'}${favoriteCount?` · ${favoriteCount} favorite`:''}${favoriteCount>1?'s':''}${flaggedCount?` · ${flaggedCount} flagged`:''}`;
+  summary.textContent = `${notes.length} active note${notes.length===1?'':'s'}${favoriteCount?` · ${favoriteCount} favorite${favoriteCount>1?'s':''}`:''}${flaggedCount?` · ${flaggedCount} flagged`:''}`;
 
   if(!notes.length){
     noteList.innerHTML='<div class="empty">No notes yet</div>';
@@ -522,27 +286,21 @@ function render(){
 
   noteList.innerHTML=notes.map(note=>{
     const left=note.expiresAt-Date.now();
-    const badges = [];
+    const badges=[];
     if(note.favorite) badges.push('<span class="badge favorite">★ Favorite</span>');
     if(note.flagged) badges.push('<span class="badge flagged">⚑ Flagged</span>');
-
     return `
-      <div class="note ${themeClass(note)} ${note.flagged?'flagged':''} ${note.favorite?'favorite':''}" data-id="${note.id}"
-        style="opacity:${opacity(note)}">
+      <div class="note ${themeClass(note)} ${note.flagged?'flagged':''} ${note.favorite?'favorite':''}" data-id="${note.id}" style="opacity:${opacity(note)}">
         <div class="note-top">
           <div></div>
           <div class="note-handle" aria-label="Drag to reorder" title="Drag to reorder">☰</div>
         </div>
-
         ${badges.length ? `<div class="note-badges">${badges.join('')}</div>` : ''}
-
         <div class="note-text">${escapeHtml(note.text)}</div>
-
         <div class="meta">
           <span>${formatLeft(left)}</span>
           <span>${new Date(note.createdAt).toLocaleString()}</span>
         </div>
-
         <div class="note-actions">
           <button type="button" data-a="favorite" data-id="${note.id}">${note.favorite?'Unfavorite':'Favorite'}</button>
           <button type="button" data-a="flag" data-id="${note.id}">${note.flagged?'Unflag':'Flag'}</button>
@@ -553,21 +311,13 @@ function render(){
     `;
   }).join('');
 }
-
 function addNote(){
   const text=noteText.value.trim();
   const hours=getHours();
   if(!text || !hours) return;
-
   const notes=removeExpired(loadNotes());
-  notes.unshift(createNote(
-    text,
-    hours,
-    importantBtn.classList.contains('active'),
-    favoriteBtn.classList.contains('active')
-  ));
+  notes.unshift(createNote(text,hours,importantBtn.classList.contains('active'),favoriteBtn.classList.contains('active')));
   saveNotes(notes);
-
   noteText.value='';
   customHours.value='';
   importantBtn.classList.remove('active');
@@ -576,61 +326,47 @@ function addNote(){
   favoriteBtn.setAttribute('aria-pressed','false');
   if(preset.value==='custom') preset.value='24';
   customHours.disabled=true;
-
   render();
 }
-
 function applyTheme(theme){
   document.body.classList.toggle('dark', theme==='dark');
   themeToggle.textContent = theme==='dark' ? '☀️' : '🌙';
 }
-
 preset.addEventListener('change',()=>{
   customHours.disabled = preset.value !== 'custom';
   if(!customHours.disabled) customHours.focus();
 });
-
 addBtn.addEventListener('click',addNote);
-
 importantBtn.addEventListener('click',()=>{
   const active=importantBtn.classList.toggle('active');
   importantBtn.setAttribute('aria-pressed', String(active));
 });
-
 favoriteBtn.addEventListener('click',()=>{
   const active=favoriteBtn.classList.toggle('active');
   favoriteBtn.setAttribute('aria-pressed', String(active));
 });
-
 themeToggle.addEventListener('click',()=>{
   const next=document.body.classList.contains('dark') ? 'light' : 'dark';
   localStorage.setItem(THEME_KEY,next);
   applyTheme(next);
 });
-
 noteList.addEventListener('click',e=>{
   const btn=e.target.closest('button[data-a]');
   if(!btn) return;
-
   const id=btn.dataset.id;
   const action=btn.dataset.a;
   let notes=loadNotes();
-
   if(action==='del') notes=notes.filter(n=>n.id!==id);
   if(action==='extend') notes=notes.map(n=>n.id===id ? {...n,expiresAt:n.expiresAt+86400000} : n);
   if(action==='flag') notes=notes.map(n=>n.id===id ? {...n,flagged:!n.flagged} : n);
   if(action==='favorite') notes=notes.map(n=>n.id===id ? {...n,favorite:!n.favorite} : n);
-
   saveNotes(notes);
   render();
 });
-
 noteText.addEventListener('keydown',e=>{
   if((e.ctrlKey || e.metaKey) && e.key==='Enter') addNote();
 });
-
 applyTheme(localStorage.getItem(THEME_KEY)||'dark');
-
 new Sortable(noteList,{
   animation:150,
   handle:'.note-handle',
@@ -647,7 +383,6 @@ new Sortable(noteList,{
     render();
   }
 });
-
 render();
 setInterval(render,30000);
 </script>
