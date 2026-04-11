@@ -482,9 +482,9 @@
   <main class="wrap">
     <section class="hero">
       <div class="hero-left">
-        <div class="badge">FadeNotes Lab · temporary notes that clean themselves</div>
-        <h1>Notes that expire on purpose.</h1>
-        <p class="sub">A lightweight notes app for things you only need for a few hours or a few days. Notes fade as they age and delete themselves when time runs out.</p>
+        <div class="badge">Public Safety Notepad · temporary notes</div>
+        <h1>Notepad.</h1>
+        <p class="sub">A lightweight website to keep simple notes, they delete themselves and data is store 100% locally.</p>
       </div>
       <div class="hero-right">
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle light and dark mode" title="Toggle light and dark mode">🌙</button>
@@ -495,12 +495,12 @@
       <article class="card form-card">
         <h2 class="card-title">New note</h2>
 
-        <label for="noteText">Note</label>
-        <textarea id="noteText" placeholder="Parking spot B12, door code, item to buy tomorrow..."></textarea>
+        <label for="noteText"></label>
+        <textarea id="noteText" placeholder="Examples: Item to buy tomorrow, unlock room 123, License's plate ABC-123"></textarea>
 
         <div class="row">
           <div>
-            <label for="preset">Expires in</label>
+            <label for="preset">Expires in ..</label>
             <select id="preset">
               <option value="1">1 hour</option>
               <option value="6">6 hours</option>
@@ -513,7 +513,7 @@
           </div>
           <div>
             <label for="customHours">Custom hours</label>
-            <input id="customHours" type="number" min="1" step="1" placeholder="36" disabled />
+            <input id="customHours" type="number" min="1" step="1" placeholder="2" disabled />
           </div>
         </div>
 
