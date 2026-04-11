@@ -151,10 +151,6 @@
       margin: 0 0 6px;
     }
 
-    .card-copy {
-      display: none;
-    }
-
     label {
       display: block;
       font-size: 14px;
@@ -313,6 +309,42 @@
       border-color: color-mix(in srgb, var(--warn) 45%, transparent);
     }
 
+    .progress-wrap {
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+
+    .progress-line {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .progress-bar {
+      flex: 1 1 auto;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: var(--progress, 100%);
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
     .meta {
       display: flex;
       justify-content: space-between;
@@ -442,7 +474,6 @@
     <section class="grid">
       <article class="card form-card">
         <h2 class="card-title">New note</h2>
-        
 
         <label for="noteText">Note</label>
         <textarea id="noteText" placeholder="Examples: parking spot B12, door code, item to buy tomorrow..."></textarea>
@@ -552,6 +583,12 @@
       return notes.filter(note => note.expiresAt > now);
     }
 
+    function getProgress(note) {
+      const total = Math.max(1, note.expiresAt - note.createdAt);
+      const left = note.expiresAt - Date.now();
+      return Math.max(0, Math.min(1, left / total));
+    }
+
     function formatRemaining(ms) {
       if (ms <= 0) return 'expired';
       const totalMinutes = Math.floor(ms / 60000);
@@ -569,19 +606,19 @@
     }
 
     function getOpacity(note) {
-      const total = Math.max(1, note.expiresAt - note.createdAt);
-      const left = note.expiresAt - Date.now();
-      const ratio = Math.max(0, Math.min(1, left / total));
+      const ratio = getProgress(note);
       return 0.28 + ratio * 0.72;
     }
 
     function getStatus(note) {
-      const left = note.expiresAt - Date.now();
-      const total = Math.max(1, note.expiresAt - note.createdAt);
-      const ratio = left / total;
+      const ratio = getProgress(note);
       if (ratio > 0.6) return 'Fresh';
       if (ratio > 0.25) return 'Aging';
       return 'Fading';
+    }
+
+    function getProgressPercent(note) {
+      return `${Math.max(6, Math.round(getProgress(note) * 100))}%`;
     }
 
     function escapeHtml(text) {
@@ -589,7 +626,7 @@
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
-        .replace(/\"/g, '&quot;')
+        .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
     }
 
@@ -614,6 +651,7 @@
         const left = note.expiresAt - Date.now();
         const opacity = getOpacity(note);
         const statusLabel = getStatus(note);
+        const progressWidth = getProgressPercent(note);
         return `
           <div class="note ${note.flagged ? 'flagged' : ''}" style="opacity:${opacity}">
             <div class="note-top">
@@ -624,6 +662,16 @@
               <div class="pill">${formatRemaining(left)}</div>
             </div>
             <div class="note-text">${escapeHtml(note.text)}</div>
+
+            <div class="progress-wrap">
+              <div class="progress-line">
+                <div class="progress-bar" aria-hidden="true">
+                  <div class="progress-fill" style="--progress:${progressWidth}"></div>
+                </div>
+                <div class="progress-text">${formatRemaining(left)}</div>
+              </div>
+            </div>
+
             <div class="meta">
               <div class="time">Created ${formatCreated(note.createdAt)}</div>
               <div class="note-actions">
@@ -675,6 +723,7 @@
 
     addBtn.addEventListener('click', addNote);
     clearExpiredBtn.addEventListener('click', clearExpiredNow);
+
     importantBtn.addEventListener('click', () => {
       const isActive = importantBtn.classList.toggle('active');
       importantBtn.setAttribute('aria-pressed', String(isActive));
