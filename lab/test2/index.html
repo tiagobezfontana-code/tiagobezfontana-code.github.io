@@ -252,6 +252,8 @@
     .note-list {
       display: grid;
       gap: 12px;
+      grid-auto-rows: max-content;
+      align-items: start;
     }
 
     .empty {
@@ -271,6 +273,9 @@
       border-radius: 20px;
       padding: 15px;
       transition: opacity 0.3s ease, transform 0.3s ease;
+      height: auto;
+      min-height: 0;
+      align-self: start;
     }
 
     .note.flagged {
@@ -284,6 +289,8 @@
       align-items: start;
       gap: 12px;
       margin-bottom: 10px;
+      height: auto;
+      min-height: 0;
     }
 
     .note-top-left {
@@ -297,6 +304,8 @@
       min-width: 180px;
       max-width: 220px;
       flex: 0 1 220px;
+      height: auto;
+      min-height: 0;
     }
 
     .note-text {
@@ -304,6 +313,9 @@
       line-height: 1.45;
       font-size: 15px;
       word-break: break-word;
+      margin: 0;
+      height: auto;
+      min-height: 0;
     }
 
     .pill {
@@ -409,12 +421,8 @@
     }
 
     @media (max-width: 860px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-      .form-card {
-        position: static;
-      }
+      .grid { grid-template-columns: 1fr; }
+      .form-card { position: static; }
     }
 
     @media (max-width: 560px) {
@@ -428,13 +436,8 @@
         margin-bottom: 12px;
       }
 
-      .badge {
-        font-size: 12px;
-      }
-
-      .row {
-        grid-template-columns: 1fr;
-      }
+      .badge { font-size: 12px; }
+      .row { grid-template-columns: 1fr; }
 
       .actions {
         grid-template-columns: 1fr 1fr;
@@ -447,29 +450,29 @@
         font-size: 13px;
       }
 
-      .list-head,
-      .meta,
-      .note-top {
-        align-items: flex-start;
-      }
+      .list-head, .meta { align-items: flex-start; }
 
       .note-top {
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        align-items: start;
+        margin-bottom: 10px;
       }
 
       .note-top-right {
-        min-width: 100%;
+        min-width: 0;
         max-width: 100%;
         width: 100%;
       }
 
-      .note-actions {
-        width: 100%;
+      .note, .note-text, .note-top, .note-top-right, .meta {
+        height: auto;
+        min-height: 0;
       }
 
-      .note-actions .tiny {
-        flex: 1 1 auto;
-      }
+      .note-actions { width: 100%; }
+      .note-actions .tiny { flex: 1 1 auto; }
 
       .theme-toggle {
         width: 48px;
@@ -482,9 +485,9 @@
   <main class="wrap">
     <section class="hero">
       <div class="hero-left">
-        <div class="badge">Public Safety Notepad · temporary notes</div>
-        <h1>Notepad.</h1>
-        <p class="sub">A lightweight website to keep simple notes, they delete themselves and data is store 100% locally.</p>
+        <div class="badge">FadeNotes Lab · temporary notes that clean themselves</div>
+        <h1>Notes that expire on purpose.</h1>
+        <p class="sub">A lightweight notes app for things you only need for a few hours or a few days. Notes fade as they age and delete themselves when time runs out.</p>
       </div>
       <div class="hero-right">
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle light and dark mode" title="Toggle light and dark mode">🌙</button>
@@ -494,13 +497,12 @@
     <section class="grid">
       <article class="card form-card">
         <h2 class="card-title">New note</h2>
-
-        <label for="noteText"></label>
-        <textarea id="noteText" placeholder="Examples: Item to buy tomorrow, unlock room 123, License's plate ABC-123"></textarea>
+        <label for="noteText">Note</label>
+        <textarea id="noteText" placeholder="Parking spot B12, door code, item to buy tomorrow..."></textarea>
 
         <div class="row">
           <div>
-            <label for="preset">Expires in ..</label>
+            <label for="preset">Expires in</label>
             <select id="preset">
               <option value="1">1 hour</option>
               <option value="6">6 hours</option>
@@ -513,7 +515,7 @@
           </div>
           <div>
             <label for="customHours">Custom hours</label>
-            <input id="customHours" type="number" min="1" step="1" placeholder="2" disabled />
+            <input id="customHours" type="number" min="1" step="1" placeholder="36" disabled />
           </div>
         </div>
 
@@ -530,7 +532,6 @@
             <p id="summary">0 active notes</p>
           </div>
         </div>
-
         <div id="noteList" class="note-list"></div>
       </article>
     </section>
@@ -539,46 +540,30 @@
   </main>
 
   <script>
-    const STORAGE_KEY = 'fadenotes-lab-v1';
-    const THEME_KEY = 'fadenotes-theme-v1';
+    const STORAGE_KEY='fadenotes-lab-v1';
+    const THEME_KEY='fadenotes-theme-v1';
+    const noteText=document.getElementById('noteText');
+    const preset=document.getElementById('preset');
+    const customHours=document.getElementById('customHours');
+    const importantBtn=document.getElementById('importantBtn');
+    const addBtn=document.getElementById('addBtn');
+    const noteList=document.getElementById('noteList');
+    const summary=document.getElementById('summary');
+    const themeToggle=document.getElementById('themeToggle');
 
-    const noteText = document.getElementById('noteText');
-    const preset = document.getElementById('preset');
-    const customHours = document.getElementById('customHours');
-    const importantBtn = document.getElementById('importantBtn');
-    const addBtn = document.getElementById('addBtn');
-    const noteList = document.getElementById('noteList');
-    const summary = document.getElementById('summary');
-    const themeToggle = document.getElementById('themeToggle');
+    function loadNotes(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; } }
+    function saveNotes(notes){ localStorage.setItem(STORAGE_KEY, JSON.stringify(notes)); }
+    function saveTheme(theme){ localStorage.setItem(THEME_KEY, theme); }
+    function loadTheme(){ return localStorage.getItem(THEME_KEY) || 'dark'; }
 
-    function loadNotes() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      } catch {
-        return [];
-      }
-    }
-
-    function saveNotes(notes) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
-    }
-
-    function saveTheme(theme) {
-      localStorage.setItem(THEME_KEY, theme);
-    }
-
-    function loadTheme() {
-      return localStorage.getItem(THEME_KEY) || 'dark';
-    }
-
-    function applyTheme(theme) {
+    function applyTheme(theme){
       document.body.classList.toggle('dark', theme === 'dark');
       themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
       themeToggle.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
       themeToggle.setAttribute('aria-label', themeToggle.title);
     }
 
-    function getHours() {
+    function getHours(){
       if (preset.value === 'custom') {
         const value = Number(customHours.value);
         return Number.isFinite(value) && value > 0 ? value : null;
@@ -586,70 +571,56 @@
       return Number(preset.value);
     }
 
-    function createNote(text, hours, flagged) {
+    function createNote(text, hours, flagged){
       const now = Date.now();
-      return {
-        id: crypto.randomUUID(),
-        text,
-        flagged,
-        createdAt: now,
-        expiresAt: now + hours * 60 * 60 * 1000,
-      };
+      return { id: crypto.randomUUID(), text, flagged, createdAt: now, expiresAt: now + hours * 60 * 60 * 1000 };
     }
 
-    function removeExpired(notes) {
+    function removeExpired(notes){
       const now = Date.now();
       return notes.filter(note => note.expiresAt > now);
     }
 
-    function getProgress(note) {
+    function getProgress(note){
       const total = Math.max(1, note.expiresAt - note.createdAt);
       const left = note.expiresAt - Date.now();
       return Math.max(0, Math.min(1, left / total));
     }
 
-    function formatRemaining(ms) {
+    function formatRemaining(ms){
       if (ms <= 0) return 'expired';
       const totalMinutes = Math.floor(ms / 60000);
       const days = Math.floor(totalMinutes / (60 * 24));
       const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
       const minutes = totalMinutes % 60;
-
       if (days > 0) return `${days}d ${hours}h left`;
       if (hours > 0) return `${hours}h ${minutes}m left`;
       return `${minutes}m left`;
     }
 
-    function formatCreated(ts) {
-      return new Date(ts).toLocaleString();
-    }
+    function formatCreated(ts){ return new Date(ts).toLocaleString(); }
 
-    function getOpacity(note) {
+    function getOpacity(note){
       const ratio = getProgress(note);
       return 0.28 + ratio * 0.72;
     }
 
-    function getStatus(note) {
+    function getStatus(note){
       const ratio = getProgress(note);
       if (ratio > 0.6) return 'Fresh';
       if (ratio > 0.25) return 'Aging';
       return 'Fading';
     }
 
-    function getProgressPercent(note) {
+    function getProgressPercent(note){
       return `${Math.max(6, Math.round(getProgress(note) * 100))}%`;
     }
 
-    function escapeHtml(text) {
-      return text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+    function escapeHtml(text){
+      return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
 
-    function render() {
+    function render(){
       let notes = removeExpired(loadNotes());
       saveNotes(notes);
 
@@ -703,19 +674,11 @@
       }).join('');
     }
 
-    function addNote() {
+    function addNote(){
       const text = noteText.value.trim();
       const hours = getHours();
-
-      if (!text) {
-        alert('Write a note first.');
-        return;
-      }
-
-      if (!hours) {
-        alert('Choose a valid expiration time.');
-        return;
-      }
+      if (!text) { alert('Write a note first.'); return; }
+      if (!hours) { alert('Choose a valid expiration time.'); return; }
 
       const notes = removeExpired(loadNotes());
       notes.unshift(createNote(text, hours, importantBtn.classList.contains('active')));
@@ -755,34 +718,16 @@
       const id = button.dataset.id;
       let notes = removeExpired(loadNotes());
 
-      if (action === 'delete') {
-        notes = notes.filter(note => note.id !== id);
-      }
-
-      if (action === 'extend') {
-        notes = notes.map(note =>
-          note.id === id
-            ? { ...note, expiresAt: note.expiresAt + 24 * 60 * 60 * 1000 }
-            : note
-        );
-      }
-
-      if (action === 'toggle-flag') {
-        notes = notes.map(note =>
-          note.id === id
-            ? { ...note, flagged: !note.flagged }
-            : note
-        );
-      }
+      if (action === 'delete') notes = notes.filter(note => note.id !== id);
+      if (action === 'extend') notes = notes.map(note => note.id === id ? { ...note, expiresAt: note.expiresAt + 24 * 60 * 60 * 1000 } : note);
+      if (action === 'toggle-flag') notes = notes.map(note => note.id === id ? { ...note, flagged: !note.flagged } : note);
 
       saveNotes(notes);
       render();
     });
 
     noteText.addEventListener('keydown', (event) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
-        addNote();
-      }
+      if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') addNote();
     });
 
     applyTheme(loadTheme());
