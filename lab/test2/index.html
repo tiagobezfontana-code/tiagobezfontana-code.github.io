@@ -4,35 +4,48 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FadeNotes Lab</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f4f7fb;
-      --bg-2: #eaf0f8;
-      --panel: #ffffff;
-      --panel-2: #f7f9fd;
-      --text: #172033;
-      --muted: #64748b;
-      --accent: #4f7cff;
-      --danger: #d64b63;
-      --warn: #d48a1c;
-      --ok: #2f9b51;
-      --border: rgba(23, 32, 51, 0.08);
-      --shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+      --bg: #eef2f7;
+      --bg-2: #e6ebf3;
+      --panel: rgba(255, 255, 255, 0.74);
+      --panel-strong: rgba(255, 255, 255, 0.92);
+      --panel-soft: rgba(255, 255, 255, 0.52);
+      --text: #1d2433;
+      --muted: #6f7b91;
+      --accent: #ff7a45;
+      --accent-2: #5f8dff;
+      --border: rgba(255, 255, 255, 0.55);
+      --shadow: 0 10px 30px rgba(73, 89, 120, 0.10);
+      --shadow-strong: 0 18px 45px rgba(73, 89, 120, 0.16);
+      --danger: #d84f67;
+      --warn: #e5a432;
+      --ok: #4ea66c;
+      --fresh: linear-gradient(135deg, #edf4ff 0%, #dce8ff 100%);
+      --aging: linear-gradient(135deg, #fff7dd 0%, #ffe9b0 100%);
+      --fading: linear-gradient(135deg, #ffe5dc 0%, #ffc8b6 100%);
     }
 
     body.dark {
-      --bg: #0b1220;
-      --bg-2: #121b2d;
-      --panel: #111a2b;
-      --panel-2: #182338;
-      --text: #e8eefc;
-      --muted: #9fb0d1;
-      --accent: #7aa2ff;
-      --danger: #ff6b81;
-      --warn: #ffb454;
-      --ok: #7bd88f;
-      --border: rgba(255, 255, 255, 0.08);
-      --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+      --bg: #111826;
+      --bg-2: #0d1420;
+      --panel: rgba(24, 34, 51, 0.74);
+      --panel-strong: rgba(27, 39, 58, 0.92);
+      --panel-soft: rgba(31, 43, 63, 0.50);
+      --text: #edf2ff;
+      --muted: #9eacc8;
+      --accent: #ff8b57;
+      --accent-2: #7da0ff;
+      --border: rgba(255, 255, 255, 0.09);
+      --shadow: 0 18px 40px rgba(0, 0, 0, 0.30);
+      --shadow-strong: 0 24px 50px rgba(0, 0, 0, 0.42);
+      --danger: #ff7a90;
+      --warn: #ffc262;
+      --ok: #7fd59a;
+      --fresh: linear-gradient(135deg, rgba(71, 106, 173, 0.50) 0%, rgba(86, 127, 214, 0.38) 100%);
+      --aging: linear-gradient(135deg, rgba(164, 120, 33, 0.46) 0%, rgba(209, 158, 55, 0.34) 100%);
+      --fading: linear-gradient(135deg, rgba(171, 84, 59, 0.52) 0%, rgba(214, 114, 85, 0.34) 100%);
     }
 
     * {
@@ -43,23 +56,27 @@
     html, body {
       margin: 0;
       min-height: 100vh;
-      font-family: Arial, Helvetica, sans-serif;
-      background:
-        radial-gradient(circle at top, rgba(79, 124, 255, 0.12), transparent 30%),
-        linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text);
+      background:
+        radial-gradient(circle at 12% 10%, rgba(255, 255, 255, 0.85), transparent 22%),
+        radial-gradient(circle at 88% 14%, rgba(255, 180, 145, 0.34), transparent 20%),
+        radial-gradient(circle at 50% 100%, rgba(95, 141, 255, 0.10), transparent 24%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
     }
 
     body.dark {
       background:
-        radial-gradient(circle at top, rgba(122, 162, 255, 0.16), transparent 30%),
-        linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+        radial-gradient(circle at 10% 12%, rgba(125, 160, 255, 0.10), transparent 20%),
+        radial-gradient(circle at 88% 10%, rgba(255, 139, 87, 0.13), transparent 18%),
+        radial-gradient(circle at 50% 100%, rgba(125, 160, 255, 0.08), transparent 24%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
     }
 
     .wrap {
-      width: min(960px, calc(100% - 24px));
+      width: min(980px, calc(100% - 22px));
       margin: 0 auto;
-      padding: 14px 0 34px;
+      padding: 14px 0 28px;
     }
 
     .hero {
@@ -83,28 +100,31 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 9px 13px;
+      padding: 9px 12px;
       border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--panel-soft);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-radius: 999px;
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12px;
       margin-bottom: 10px;
-      backdrop-filter: blur(6px);
+      box-shadow: var(--shadow);
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(28px, 7vw, 46px);
+      font-size: clamp(28px, 7vw, 44px);
       line-height: 1.02;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.04em;
+      font-weight: 700;
     }
 
     .sub {
       margin: 8px 0 0;
       color: var(--muted);
-      font-size: 15px;
-      line-height: 1.4;
+      font-size: 14px;
+      line-height: 1.45;
       max-width: 700px;
     }
 
@@ -114,6 +134,8 @@
       border: 1px solid var(--border);
       border-radius: 50%;
       background: var(--panel);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       color: var(--text);
       box-shadow: var(--shadow);
       display: inline-flex;
@@ -125,22 +147,25 @@
 
     .grid {
       display: grid;
-      grid-template-columns: 340px 1fr;
+      grid-template-columns: 350px 1fr;
       gap: 16px;
+      align-items: start;
     }
 
     .card {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+      background: var(--panel);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--border);
-      border-radius: 22px;
+      border-radius: 28px;
       box-shadow: var(--shadow);
       overflow: hidden;
     }
 
     .form-card {
-      padding: 16px;
+      padding: 18px;
       position: sticky;
-      top: 14px;
+      top: 12px;
       align-self: start;
     }
 
@@ -150,40 +175,45 @@
 
     .card-title {
       margin: 0 0 10px;
-      font-size: 20px;
+      font-size: 21px;
+      letter-spacing: -0.02em;
     }
 
     label {
       display: block;
       margin: 12px 0 8px;
       color: var(--muted);
-      font-size: 14px;
+      font-size: 13px;
+      font-weight: 600;
     }
 
     textarea, select, input {
       width: 100%;
       border: 1px solid var(--border);
-      background: var(--panel-2);
+      background: var(--panel-strong);
       color: var(--text);
-      border-radius: 16px;
-      padding: 13px 14px;
+      border-radius: 20px;
+      padding: 14px 15px;
       font-size: 16px;
       outline: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+
+    body.dark textarea,
+    body.dark select,
+    body.dark input {
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
     }
 
     textarea {
-      min-height: 220px;
+      min-height: 240px;
       resize: vertical;
+      line-height: 1.45;
     }
 
     textarea:focus, select:focus, input:focus {
-      border-color: rgba(79, 124, 255, 0.45);
-    }
-
-    body.dark textarea:focus,
-    body.dark select:focus,
-    body.dark input:focus {
-      border-color: rgba(122, 162, 255, 0.5);
+      border-color: rgba(95, 141, 255, 0.45);
+      box-shadow: 0 0 0 4px rgba(95, 141, 255, 0.10);
     }
 
     .row {
@@ -201,16 +231,18 @@
 
     button {
       border: 0;
-      border-radius: 16px;
+      border-radius: 18px;
       padding: 13px 14px;
       font-size: 15px;
-      min-height: 48px;
+      min-height: 50px;
       cursor: pointer;
-      transition: transform 0.15s ease, opacity 0.15s ease, background 0.2s ease;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease, background 0.18s ease;
+      font-family: inherit;
     }
 
     button:hover {
       transform: translateY(-1px);
+      box-shadow: var(--shadow);
     }
 
     button:active {
@@ -218,19 +250,20 @@
     }
 
     .primary {
-      background: var(--accent);
+      background: linear-gradient(135deg, var(--accent) 0%, #ff9968 100%);
       color: white;
       font-weight: 700;
+      box-shadow: 0 10px 24px rgba(255, 122, 69, 0.25);
     }
 
     .secondary {
-      background: rgba(255, 255, 255, 0.08);
+      background: var(--panel-strong);
       color: var(--text);
       border: 1px solid var(--border);
     }
 
     .flag-button {
-      width: 52px;
+      width: 54px;
       padding: 0;
       font-size: 22px;
       display: inline-flex;
@@ -239,10 +272,15 @@
     }
 
     .flag-button.active {
-      background: rgba(212, 138, 28, 0.16);
-      color: var(--warn);
-      border: 1px solid rgba(212, 138, 28, 0.28);
-      font-weight: 700;
+      background: linear-gradient(135deg, #fff3d8 0%, #ffe7aa 100%);
+      color: #cb8a10;
+      border: 1px solid rgba(229, 164, 50, 0.26);
+      box-shadow: 0 10px 24px rgba(229, 164, 50, 0.16);
+    }
+
+    body.dark .flag-button.active {
+      background: linear-gradient(135deg, rgba(164, 120, 33, 0.46) 0%, rgba(209, 158, 55, 0.32) 100%);
+      color: #ffd37d;
     }
 
     .list-head {
@@ -250,7 +288,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      padding: 8px 8px 14px;
+      padding: 8px 8px 12px;
     }
 
     .list-head p {
@@ -269,23 +307,42 @@
       text-align: center;
       color: var(--muted);
       border: 1px dashed var(--border);
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.02);
+      border-radius: 22px;
+      background: var(--panel-soft);
+      backdrop-filter: blur(16px);
       line-height: 1.45;
       font-size: 15px;
     }
 
     .note {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 20px;
+      background: var(--fresh);
+      border: 1px solid rgba(255,255,255,0.42);
+      border-radius: 24px;
       padding: 15px;
-      transition: opacity 0.3s ease, transform 0.3s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.35s ease, filter 0.35s ease;
+      box-shadow: var(--shadow);
+    }
+
+    .note:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-strong);
+    }
+
+    .note.note-aging {
+      background: var(--aging);
+    }
+
+    .note.note-fading {
+      background: var(--fading);
     }
 
     .note.flagged {
-      border-color: rgba(212, 138, 28, 0.35);
-      box-shadow: inset 0 0 0 1px rgba(212, 138, 28, 0.18);
+      box-shadow: 0 16px 36px rgba(229, 164, 50, 0.16);
+    }
+
+    .note.dragging {
+      opacity: 0.76 !important;
+      transform: scale(1.01);
     }
 
     .note-top {
@@ -306,24 +363,37 @@
     .note-text {
       white-space: pre-wrap;
       word-break: break-word;
-      line-height: 1.45;
+      line-height: 1.5;
       font-size: 15px;
+      color: var(--text);
     }
 
     .pill {
       font-size: 12px;
       border-radius: 999px;
-      padding: 6px 10px;
-      background: rgba(255, 255, 255, 0.06);
+      padding: 7px 10px;
+      background: rgba(255, 255, 255, 0.62);
       color: var(--muted);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(255,255,255,0.46);
       white-space: nowrap;
+      backdrop-filter: blur(10px);
+    }
+
+    body.dark .pill {
+      background: rgba(17, 26, 43, 0.42);
+      border-color: rgba(255,255,255,0.08);
     }
 
     .pill.flag {
-      color: #fff;
-      background: rgba(212, 138, 28, 0.85);
-      border-color: rgba(212, 138, 28, 0.45);
+      color: #9a6710;
+      background: rgba(255, 243, 216, 0.88);
+      border-color: rgba(229, 164, 50, 0.28);
+      font-weight: 700;
+    }
+
+    body.dark .pill.flag {
+      color: #ffd37d;
+      background: rgba(164, 120, 33, 0.34);
     }
 
     .meta {
@@ -349,26 +419,55 @@
     .tiny {
       padding: 9px 11px;
       font-size: 13px;
-      border-radius: 12px;
+      border-radius: 14px;
       min-height: 40px;
+      background: rgba(255, 255, 255, 0.56);
+      border: 1px solid rgba(255,255,255,0.48);
+      color: var(--text);
+    }
+
+    body.dark .tiny {
+      background: rgba(17, 26, 43, 0.35);
+      border-color: rgba(255,255,255,0.08);
     }
 
     .tiny.danger {
-      background: rgba(214, 75, 99, 0.12);
       color: var(--danger);
-      border: 1px solid rgba(214, 75, 99, 0.18);
     }
 
     .tiny.extend {
-      background: rgba(47, 155, 81, 0.12);
       color: var(--ok);
-      border: 1px solid rgba(47, 155, 81, 0.18);
     }
 
     .tiny.flag-toggle {
-      background: rgba(212, 138, 28, 0.12);
       color: var(--warn);
-      border: 1px solid rgba(212, 138, 28, 0.18);
+    }
+
+    .note-handle {
+      width: 34px;
+      min-width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.42);
+      background: rgba(255,255,255,0.50);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      backdrop-filter: blur(10px);
+    }
+
+    body.dark .note-handle {
+      background: rgba(17, 26, 43, 0.35);
+      border-color: rgba(255,255,255,0.08);
+    }
+
+    .note-handle:active {
+      cursor: grabbing;
     }
 
     .footer {
@@ -391,8 +490,8 @@
 
     @media (max-width: 560px) {
       .wrap {
-        width: min(100%, calc(100% - 16px));
-        padding-top: 12px;
+        width: min(100%, calc(100% - 14px));
+        padding-top: 10px;
       }
 
       .hero {
@@ -401,7 +500,11 @@
       }
 
       .badge {
-        font-size: 12px;
+        font-size: 11px;
+      }
+
+      .sub {
+        font-size: 13px;
       }
 
       .row {
@@ -427,34 +530,9 @@
       }
 
       .theme-toggle {
-        width: 48px;
-        height: 48px;
+        width: 46px;
+        height: 46px;
       }
-    }
-  
-    .note.dragging {
-      opacity: 0.8 !important;
-    }
-
-    .note-handle {
-      width: 34px;
-      min-width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.05);
-      color: var(--muted);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      cursor: grab;
-      touch-action: none;
-      user-select: none;
-    }
-
-    .note-handle:active {
-      cursor: grabbing;
     }
   </style>
 </head>
@@ -462,9 +540,9 @@
   <main class="wrap">
     <section class="hero">
       <div class="hero-left">
-        <div class="badge">FadeNotes Lab · temporary notes that clean themselves</div>
+        <div class="badge">FadeNotes Lab · soft card theme</div>
         <h1>Notes that expire on purpose.</h1>
-        <p class="sub">A lightweight notes app for things you only need for a few hours or a few days. Notes fade as they age and delete themselves when time runs out.</p>
+        <p class="sub">Soft floating cards, clean mobile spacing, and notes that visually fade away as expiration gets closer.</p>
       </div>
       <div class="hero-right">
         <button class="theme-toggle" id="themeToggle" aria-label="Switch to light mode" title="Switch to light mode">☀️</button>
@@ -600,20 +678,39 @@
       return new Date(ts).toLocaleString();
     }
 
-    function getOpacity(note) {
+    function getProgress(note) {
       const total = Math.max(1, note.expiresAt - note.createdAt);
       const left = note.expiresAt - Date.now();
-      const ratio = Math.max(0, Math.min(1, left / total));
-      return 0.28 + ratio * 0.72;
+      return Math.max(0, Math.min(1, left / total));
+    }
+
+    function getOpacity(note) {
+      const ratio = getProgress(note);
+      return 0.12 + ratio * 0.88;
+    }
+
+    function getScale(note) {
+      const ratio = getProgress(note);
+      return 0.975 + ratio * 0.025;
+    }
+
+    function getBlur(note) {
+      const ratio = getProgress(note);
+      return (1 - ratio) * 0.8;
     }
 
     function getStatus(note) {
-      const left = note.expiresAt - Date.now();
-      const total = Math.max(1, note.expiresAt - note.createdAt);
-      const ratio = left / total;
+      const ratio = getProgress(note);
       if (ratio > 0.6) return 'Fresh';
       if (ratio > 0.25) return 'Aging';
       return 'Fading';
+    }
+
+    function getThemeClass(note) {
+      const ratio = getProgress(note);
+      if (ratio > 0.6) return 'note-fresh';
+      if (ratio > 0.25) return 'note-aging';
+      return 'note-fading';
     }
 
     function escapeHtml(text) {
@@ -653,9 +750,12 @@
       noteList.innerHTML = notes.map(note => {
         const left = note.expiresAt - Date.now();
         const opacity = getOpacity(note);
+        const scale = getScale(note);
+        const blur = getBlur(note);
         const statusLabel = getStatus(note);
+        const themeClass = getThemeClass(note);
         return `
-          <div class="note ${note.flagged ? 'flagged' : ''}" data-id="${note.id}" style="opacity:${opacity}">
+          <div class="note ${themeClass} ${note.flagged ? 'flagged' : ''}" data-id="${note.id}" style="opacity:${opacity}; transform:scale(${scale}); filter:blur(${blur}px);">
             <div class="note-top">
               <div class="note-top-left">
                 ${note.flagged ? '<div class="pill flag">⚑ Important</div>' : ''}
