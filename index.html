@@ -5,33 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tiago Fontana | Project Hub</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    :root {
+      --bg: #0b1220;
+      --bg-secondary: #111a2e;
+      --panel: rgba(17, 26, 46, 0.78);
+      --panel-strong: rgba(20, 31, 54, 0.92);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --text: #f3f7ff;
+      --muted: #a7b4ce;
+      --blue: #4f8cff;
+      --blue-hover: #3b78ea;
+      --green: #2ecc71;
+      --yellow: #f4b942;
+      --red: #ff6b6b;
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      --radius: 22px;
+      --radius-sm: 14px;
+      --max-width: 1200px;
     }
 
-    :root {
-      --bg1: #0f172a;
-      --bg2: #111827;
-      --panel: rgba(255, 255, 255, 0.06);
-      --panel-border: rgba(255, 255, 255, 0.10);
-      --text: #f8fafc;
-      --muted: #cbd5e1;
-      --blue: #2563eb;
-      --blue-hover: #1d4ed8;
-      --green: #22c55e;
-      --yellow: #f59e0b;
-      --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
+      margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(37, 99, 235, 0.18), transparent 30%),
-        linear-gradient(135deg, var(--bg1), var(--bg2));
+        radial-gradient(circle at top left, rgba(79, 140, 255, 0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(46, 204, 113, 0.10), transparent 20%),
+        linear-gradient(180deg, #09101d 0%, #0b1220 100%);
       color: var(--text);
-      line-height: 1.6;
       min-height: 100vh;
     }
 
@@ -41,386 +50,676 @@
     }
 
     .container {
-      width: 92%;
-      max-width: 1200px;
+      width: min(92%, var(--max-width));
       margin: 0 auto;
     }
 
-    header {
-      padding: 70px 0 35px;
+    .topbar-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+      background: rgba(8, 13, 24, 0.55);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    .hero {
-      background: var(--panel);
-      border: 1px solid var(--panel-border);
-      border-radius: 24px;
-      padding: 40px 32px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-    }
-
-    .hero-top {
+    .topbar {
+      width: min(92%, var(--max-width));
+      margin: 0 auto;
+      min-height: 74px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      gap: 20px;
+      justify-content: space-between;
+      gap: 18px;
       flex-wrap: wrap;
-      margin-bottom: 18px;
     }
 
-    .badge {
-      display: inline-block;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: rgba(37, 99, 235, 0.18);
-      color: #bfdbfe;
-      font-size: 0.85rem;
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand-title {
+      font-size: 1.05rem;
       font-weight: bold;
       letter-spacing: 0.3px;
     }
 
-    h1 {
-      font-size: 3rem;
-      line-height: 1.1;
-      margin-bottom: 12px;
-    }
-
-    .hero p {
-      max-width: 760px;
+    .brand-subtitle {
       color: var(--muted);
-      font-size: 1.05rem;
-      margin-bottom: 24px;
+      font-size: 0.88rem;
     }
 
-    .hero-buttons {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 12px 18px;
-      border-radius: 12px;
-      font-weight: bold;
-      transition: 0.2s ease;
-      border: 1px solid transparent;
-    }
-
-    .btn-primary {
-      background: var(--blue);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--blue-hover);
-      transform: translateY(-2px);
-    }
-
-    .btn-secondary {
-      background: rgba(255,255,255,0.04);
-      border-color: rgba(255,255,255,0.12);
-      color: var(--text);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(255,255,255,0.08);
-      transform: translateY(-2px);
-    }
-
-    .quick-stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 14px;
-      margin-top: 24px;
-    }
-
-    .stat {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 18px;
-    }
-
-    .stat h3 {
-      font-size: 1.6rem;
-      margin-bottom: 4px;
-    }
-
-    .stat p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    section {
-      padding: 34px 0;
-    }
-
-    .section-header {
-      margin-bottom: 20px;
-    }
-
-    .section-header h2 {
-      font-size: 2rem;
-      margin-bottom: 6px;
-    }
-
-    .section-header p {
-      color: var(--muted);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-      gap: 20px;
-    }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--panel-border);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: var(--shadow);
-      transition: 0.25s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
-      border-color: rgba(255,255,255,0.18);
-    }
-
-    .status {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      font-weight: bold;
-      margin-bottom: 14px;
-    }
-
-    .status-active {
-      background: rgba(34,197,94,0.15);
-      color: #86efac;
-    }
-
-    .status-stable {
-      background: rgba(37,99,235,0.15);
-      color: #93c5fd;
-    }
-
-    .status-dev {
-      background: rgba(245,158,11,0.15);
-      color: #fde68a;
-    }
-
-    .card h3 {
-      font-size: 1.35rem;
-      margin-bottom: 10px;
-    }
-
-    .card p {
-      color: var(--muted);
-      margin-bottom: 18px;
-      min-height: 72px;
-    }
-
-    .card-buttons {
+    .nav-links {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
     }
 
-    .mini-panel {
-      background: var(--panel);
-      border: 1px solid var(--panel-border);
+    .nav-link {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: var(--muted);
+      border: 1px solid transparent;
+      transition: 0.2s ease;
+      font-size: 0.95rem;
+    }
+
+    .nav-link:hover {
+      color: var(--text);
+      border-color: var(--border);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .hero {
+      padding: 48px 0 26px;
+    }
+
+    .hero-panel {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(19, 31, 55, 0.92), rgba(13, 22, 40, 0.88));
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      padding: 38px 34px;
+    }
+
+    .hero-panel::before {
+      content: "";
+      position: absolute;
+      width: 340px;
+      height: 340px;
+      background: radial-gradient(circle, rgba(79, 140, 255, 0.18), transparent 65%);
+      top: -120px;
+      right: -80px;
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(79, 140, 255, 0.12);
+      border: 1px solid rgba(79, 140, 255, 0.2);
+      color: #bcd3ff;
+      font-size: 0.84rem;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      line-height: 1.05;
+      max-width: 760px;
+    }
+
+    .hero-text {
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      margin-bottom: 26px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 26px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 18px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      font-weight: bold;
+      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--blue-hover);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: var(--border-strong);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 0.9fr;
+      gap: 18px;
+      margin-top: 12px;
+    }
+
+    .summary-panel,
+    .status-panel {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid var(--border);
       border-radius: 20px;
+      padding: 20px;
+    }
+
+    .panel-title {
+      font-size: 0.95rem;
+      font-weight: bold;
+      margin-bottom: 14px;
+      color: #d8e4ff;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .summary-box {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .summary-box h3 {
+      margin: 0 0 6px;
+      font-size: 1.7rem;
+    }
+
+    .summary-box p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    .status-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .status-name {
+      font-size: 0.95rem;
+      color: #dce7ff;
+    }
+
+    .pill {
+      display: inline-block;
+      font-size: 0.76rem;
+      font-weight: bold;
+      padding: 6px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .pill-green {
+      background: rgba(46, 204, 113, 0.16);
+      color: #9ef0bf;
+    }
+
+    .pill-blue {
+      background: rgba(79, 140, 255, 0.16);
+      color: #bdd5ff;
+    }
+
+    .pill-yellow {
+      background: rgba(244, 185, 66, 0.16);
+      color: #ffe2a3;
+    }
+
+    section {
+      padding: 20px 0 14px;
+    }
+
+    .section-header {
+      margin-bottom: 16px;
+    }
+
+    .section-header h2 {
+      margin: 0 0 8px;
+      font-size: 1.9rem;
+    }
+
+    .section-header p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(17, 26, 46, 0.9), rgba(12, 20, 37, 0.92));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: var(--border-strong);
+      box-shadow: 0 24px 56px rgba(0, 0, 0, 0.42);
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: auto -40px -40px auto;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, rgba(79, 140, 255, 0.12), transparent 70%);
+      pointer-events: none;
+    }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 1.3rem;
+    }
+
+    .card p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      min-height: 78px;
+      line-height: 1.65;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .small-btn {
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      font-weight: bold;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
+      transition: 0.18s ease;
+    }
+
+    .small-btn:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: var(--border-strong);
+    }
+
+    .small-btn.primary {
+      background: rgba(79, 140, 255, 0.16);
+      border-color: rgba(79, 140, 255, 0.22);
+      color: #dce9ff;
+    }
+
+    .small-btn.primary:hover {
+      background: rgba(79, 140, 255, 0.24);
+    }
+
+    .about-panel {
+      background: linear-gradient(180deg, rgba(16, 25, 43, 0.92), rgba(11, 18, 32, 0.95));
+      border: 1px solid var(--border);
+      border-radius: 26px;
       padding: 24px;
       box-shadow: var(--shadow);
     }
 
-    .about-text {
-      color: var(--muted);
-      max-width: 800px;
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      align-items: start;
     }
 
-    .links-list {
-      display: flex;
-      flex-wrap: wrap;
+    .about-text {
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .quick-links {
+      display: grid;
       gap: 12px;
-      margin-top: 16px;
+    }
+
+    .quick-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: 0.18s ease;
+    }
+
+    .quick-link:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--border-strong);
+      transform: translateX(4px);
+    }
+
+    .quick-link span:last-child {
+      color: var(--muted);
+      font-size: 0.92rem;
     }
 
     footer {
-      margin-top: 20px;
-      padding: 24px 0 34px;
+      padding: 26px 0 36px;
       text-align: center;
-      color: #94a3b8;
-      border-top: 1px solid rgba(255,255,255,0.08);
+      color: #8f9cb7;
+      font-size: 0.94rem;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .about-grid,
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 700px) {
-      h1 {
-        font-size: 2.2rem;
+      .hero-panel {
+        padding: 28px 20px;
       }
 
-      .hero {
-        padding: 28px 22px;
+      .topbar {
+        padding: 12px 0;
+      }
+
+      .nav-links {
+        width: 100%;
+      }
+
+      .nav-link {
+        font-size: 0.9rem;
       }
 
       .section-header h2 {
-        font-size: 1.6rem;
+        font-size: 1.55rem;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="topbar-wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-title">Tiago Fontana</div>
+        <div class="brand-subtitle">Security tools and project hub</div>
+      </div>
 
-    <header>
-      <div class="hero">
-        <div class="hero-top">
-          <span class="badge">PROJECT HUB</span>
-        </div>
+      <nav class="nav-links">
+        <a class="nav-link" href="#projects">Projects</a>
+        <a class="nav-link" href="#lab">Lab</a>
+        <a class="nav-link" href="#about">About</a>
+        <a class="nav-link" href="/dispatch">Dispatch</a>
+        <a class="nav-link" href="/parkingdb">Parking DB</a>
+      </nav>
+    </div>
+  </div>
 
-        <h1>Tiago Fontana</h1>
-        <p>
-          Security tools, dispatch systems, project experiments, and practical web apps.
-          This homepage is the main entry point for my active tools and development lab.
+  <main class="container">
+    <section class="hero">
+      <div class="hero-panel">
+        <span class="eyebrow">MAIN INDEX PAGE</span>
+        <h1>Project hub for tools, prototypes, and live experiments.</h1>
+        <p class="hero-text">
+          This site is the main entry point for my active web projects. It keeps my working tools organized,
+          easy to launch, and ready to expand as new pages and ideas are added.
         </p>
 
-        <div class="hero-buttons">
-          <a href="#projects" class="btn btn-primary">View Projects</a>
-          <a href="#lab" class="btn btn-secondary">Open Lab Section</a>
-          <a href="https://github.com/" target="_blank" class="btn btn-secondary">GitHub</a>
+        <div class="hero-actions">
+          <a href="#projects" class="btn btn-primary">Explore Projects</a>
+          <a href="#lab" class="btn btn-secondary">Open Lab Area</a>
+          <a href="https://github.com/" target="_blank" class="btn btn-secondary">GitHub Profile</a>
         </div>
 
-        <div class="quick-stats">
-          <div class="stat">
-            <h3>3</h3>
-            <p>Main site areas</p>
+        <div class="hero-grid">
+          <div class="summary-panel">
+            <div class="panel-title">Site Overview</div>
+            <div class="summary-grid">
+              <div class="summary-box">
+                <h3>3</h3>
+                <p>Main sections</p>
+              </div>
+              <div class="summary-box">
+                <h3>2</h3>
+                <p>Active tools</p>
+              </div>
+              <div class="summary-box">
+                <h3>1</h3>
+                <p>Lab test page</p>
+              </div>
+            </div>
           </div>
-          <div class="stat">
-            <h3>2</h3>
-            <p>Active tools</p>
-          </div>
-          <div class="stat">
-            <h3>1</h3>
-            <p>Testing lab</p>
+
+          <div class="status-panel">
+            <div class="panel-title">Current Status</div>
+            <div class="status-list">
+              <div class="status-row">
+                <span class="status-name">Dispatch CAD</span>
+                <span class="pill pill-green">ACTIVE</span>
+              </div>
+              <div class="status-row">
+                <span class="status-name">Parking Permit DB</span>
+                <span class="pill pill-blue">STABLE</span>
+              </div>
+              <div class="status-row">
+                <span class="status-name">Lab Test 1</span>
+                <span class="pill pill-yellow">DEVELOPMENT</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </header>
+    </section>
 
     <section id="projects">
       <div class="section-header">
         <h2>Featured Projects</h2>
-        <p>Main tools currently available on the website.</p>
+        <p>Main tools currently published on the website.</p>
       </div>
 
-      <div class="grid">
-        <div class="card">
-          <span class="status status-active">ACTIVE</span>
+      <div class="cards">
+        <article class="card">
+          <div class="card-top">
+            <div class="card-icon">🚓</div>
+            <span class="pill pill-green">ACTIVE</span>
+          </div>
           <h3>Dispatch CAD</h3>
           <p>
-            Dispatch interface project for operations, incident handling,
-            and workflow testing.
+            Dispatch interface project for operations, incident handling, workflow organization,
+            and future interface improvements.
           </p>
-          <div class="card-buttons">
-            <a href="/dispatch" class="btn btn-primary">Open Tool</a>
-            <a href="/dispatch" class="btn btn-secondary">View Page</a>
+          <div class="card-actions">
+            <a class="small-btn primary" href="/dispatch">Open Tool</a>
+            <a class="small-btn" href="/dispatch">View Page</a>
           </div>
-        </div>
+        </article>
 
-        <div class="card">
-          <span class="status status-stable">STABLE</span>
+        <article class="card">
+          <div class="card-top">
+            <div class="card-icon">🅿️</div>
+            <span class="pill pill-blue">STABLE</span>
+          </div>
           <h3>Parking Permit Database</h3>
           <p>
-            Searchable permit lookup tool designed to simplify access
-            to parking permit data.
+            Searchable permit lookup tool built to make parking information faster to access,
+            easier to read, and simpler to organize.
           </p>
-          <div class="card-buttons">
-            <a href="/parkingdb" class="btn btn-primary">Open Tool</a>
-            <a href="/parkingdb" class="btn btn-secondary">View Page</a>
+          <div class="card-actions">
+            <a class="small-btn primary" href="/parkingdb">Open Tool</a>
+            <a class="small-btn" href="/parkingdb">View Page</a>
           </div>
-        </div>
+        </article>
 
-        <div class="card">
-          <span class="status status-dev">DEVELOPMENT</span>
-          <h3>Future Project Slot</h3>
-          <p>
-            Reserved space for your next app, dashboard, or security-related
-            project as your site grows.
-          </p>
-          <div class="card-buttons">
-            <a href="#lab" class="btn btn-primary">See Lab</a>
+        <article class="card">
+          <div class="card-top">
+            <div class="card-icon">🧩</div>
+            <span class="pill pill-yellow">NEXT SLOT</span>
           </div>
-        </div>
+          <h3>Future Project</h3>
+          <p>
+            Reserved space for your next dashboard, automation tool, investigation page,
+            or any other project added to the site later.
+          </p>
+          <div class="card-actions">
+            <a class="small-btn primary" href="#lab">Use Lab Area</a>
+          </div>
+        </article>
       </div>
     </section>
 
     <section id="lab">
       <div class="section-header">
         <h2>Development Lab</h2>
-        <p>Testing area for experiments, redesigns, and unfinished tools.</p>
+        <p>Testing area for ideas, layouts, redesigns, and unfinished tools.</p>
       </div>
 
-      <div class="grid">
-        <div class="card">
-          <span class="status status-dev">TEST AREA</span>
+      <div class="cards">
+        <article class="card">
+          <div class="card-top">
+            <div class="card-icon">🧪</div>
+            <span class="pill pill-yellow">TEST AREA</span>
+          </div>
           <h3>Lab Test 1</h3>
           <p>
-            Experimental project page used for trying layouts, new ideas,
-            and future tool concepts.
+            Experimental page for testing new layouts, feature ideas, and future project concepts
+            before moving them into the main site.
           </p>
-          <div class="card-buttons">
-            <a href="/lab/test1" class="btn btn-primary">Open Lab</a>
+          <div class="card-actions">
+            <a class="small-btn primary" href="/lab/test1">Open Lab</a>
           </div>
-        </div>
+        </article>
 
-        <div class="card">
-          <span class="status status-dev">COMING SOON</span>
+        <article class="card">
+          <div class="card-top">
+            <div class="card-icon">🎛️</div>
+            <span class="pill pill-yellow">COMING SOON</span>
+          </div>
           <h3>UI Concepts</h3>
           <p>
-            Area for dashboard mockups, menu redesigns, and cleaner interface
-            experiments for future projects.
+            Space for future dashboard layouts, cleaner navigation ideas, and interface experiments
+            for dispatch and database projects.
           </p>
-          <div class="card-buttons">
-            <a href="#" class="btn btn-secondary">Coming Soon</a>
+          <div class="card-actions">
+            <a class="small-btn" href="#about">Planned Area</a>
           </div>
-        </div>
+        </article>
 
-        <div class="card">
-          <span class="status status-dev">COMING SOON</span>
+        <article class="card">
+          <div class="card-top">
+            <div class="card-icon">⚙️</div>
+            <span class="pill pill-yellow">COMING SOON</span>
+          </div>
           <h3>Automation Tools</h3>
           <p>
-            Reserved space for future workflow helpers, data tools,
+            Reserved area for workflow helpers, spreadsheet-based tools, quick utilities,
             and security support systems.
           </p>
-          <div class="card-buttons">
-            <a href="#" class="btn btn-secondary">Coming Soon</a>
+          <div class="card-actions">
+            <a class="small-btn" href="#about">Planned Area</a>
           </div>
-        </div>
+        </article>
       </div>
     </section>
 
     <section id="about">
       <div class="section-header">
         <h2>About This Site</h2>
-        <p>A simple central page for your tools and project links.</p>
+        <p>A simple but professional landing page for your growing project collection.</p>
       </div>
 
-      <div class="mini-panel">
-        <p class="about-text">
-          This website works as a personal project hub for active tools,
-          prototypes, and experiments. It is designed to keep projects organized,
-          easy to open, and ready to expand as new ideas are added.
-        </p>
+      <div class="about-panel">
+        <div class="about-grid">
+          <div>
+            <p class="about-text">
+              This homepage is designed to work as a central dashboard for your projects.
+              Instead of showing just a plain list of links, it gives your site a more complete
+              software-style appearance while keeping navigation simple. As you add more folders,
+              you can duplicate the project cards and point them to new GitHub Pages paths.
+            </p>
+          </div>
 
-        <div class="links-list">
-          <a href="/dispatch" class="btn btn-secondary">Dispatch</a>
-          <a href="/parkingdb" class="btn btn-secondary">Parking DB</a>
-          <a href="/lab/test1" class="btn btn-secondary">Lab Test</a>
+          <div class="quick-links">
+            <a class="quick-link" href="/dispatch">
+              <span>Dispatch CAD</span>
+              <span>/dispatch</span>
+            </a>
+            <a class="quick-link" href="/parkingdb">
+              <span>Parking Permit Database</span>
+              <span>/parkingdb</span>
+            </a>
+            <a class="quick-link" href="/lab/test1">
+              <span>Lab Test 1</span>
+              <span>/lab/test1</span>
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -428,7 +727,6 @@
     <footer>
       Tiago Fontana © 2026 - Project Hub - Version 1.0
     </footer>
-
-  </div>
+  </main>
 </body>
 </html>
