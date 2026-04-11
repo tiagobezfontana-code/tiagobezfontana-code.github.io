@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FadeNotes</title>
+  <title>FadeNotes Lab</title>
   <style>
     :root {
       --bg: #f4f7fb;
@@ -431,6 +431,31 @@
         height: 48px;
       }
     }
+  
+    .note.dragging {
+      opacity: 0.8 !important;
+    }
+
+    .note-handle {
+      width: 34px;
+      min-width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .note-handle:active {
+      cursor: grabbing;
+    }
   </style>
 </head>
 <body>
@@ -439,7 +464,7 @@
       <div class="hero-left">
         <div class="badge">FadeNotes Lab · temporary notes that clean themselves</div>
         <h1>Notes that expire on purpose.</h1>
-        <p class="sub">Remember: The notes will be saved to your device and not our servers. </p>
+        <p class="sub">A lightweight notes app for things you only need for a few hours or a few days. Notes fade as they age and delete themselves when time runs out.</p>
       </div>
       <div class="hero-right">
         <button class="theme-toggle" id="themeToggle" aria-label="Switch to light mode" title="Switch to light mode">☀️</button>
@@ -450,7 +475,7 @@
       <article class="card form-card">
         <h2 class="card-title">New note</h2>
 
-        <label for="noteText"></label>
+        <label for="noteText">Note</label>
         <textarea id="noteText" placeholder="Examples: parking spot B12, door code, item to buy tomorrow..."></textarea>
 
         <div class="row">
@@ -493,6 +518,7 @@
     <div class="footer">Version v0.1 · Designed by Tiago Fontana</div>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script>
     const STORAGE_KEY = 'fadenotes-lab-v1';
     const THEME_KEY = 'fadenotes-theme-v1';
@@ -549,6 +575,7 @@
         flagged,
         createdAt: now,
         expiresAt: now + hours * 60 * 60 * 1000,
+        order: now,
       };
     }
 
@@ -598,14 +625,22 @@
         .replace(/'/g, '&#039;');
     }
 
+    function saveVisualOrder() {
+      const ids = Array.from(noteList.querySelectorAll('.note[data-id]')).map(note => note.dataset.id);
+      let notes = removeExpired(loadNotes());
+      notes = ids.map((id, index) => {
+        const found = notes.find(note => note.id === id);
+        return found ? { ...found, order: index + 1 } : null;
+      }).filter(Boolean);
+      saveNotes(notes);
+      render();
+    }
+
     function render() {
       let notes = removeExpired(loadNotes());
       saveNotes(notes);
 
-      notes.sort((a, b) => {
-        if (a.flagged !== b.flagged) return a.flagged ? -1 : 1;
-        return a.expiresAt - b.expiresAt;
-      });
+      notes.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
       const flaggedCount = notes.filter(note => note.flagged).length;
       summary.textContent = `${notes.length} active note${notes.length === 1 ? '' : 's'}${flaggedCount ? ` · ${flaggedCount} flagged` : ''}`;
@@ -620,13 +655,16 @@
         const opacity = getOpacity(note);
         const statusLabel = getStatus(note);
         return `
-          <div class="note ${note.flagged ? 'flagged' : ''}" style="opacity:${opacity}">
+          <div class="note ${note.flagged ? 'flagged' : ''}" data-id="${note.id}" style="opacity:${opacity}">
             <div class="note-top">
               <div class="note-top-left">
                 ${note.flagged ? '<div class="pill flag">⚑ Important</div>' : ''}
                 <div class="pill">${statusLabel}</div>
               </div>
-              <div class="pill">${formatRemaining(left)}</div>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <div class="pill">${formatRemaining(left)}</div>
+                <div class="note-handle" title="Drag to reorder" aria-label="Drag to reorder">☰</div>
+              </div>
             </div>
             <div class="note-text">${escapeHtml(note.text)}</div>
             <div class="meta">
@@ -729,6 +767,16 @@
     });
 
     applyTheme(loadTheme());
+
+    const sortable = new Sortable(noteList, {
+      animation: 180,
+      handle: '.note-handle',
+      ghostClass: 'dragging',
+      delayOnTouchOnly: true,
+      delay: 120,
+      onEnd: saveVisualOrder,
+    });
+
     render();
     setInterval(render, 30000);
   </script>
