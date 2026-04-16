@@ -1,22 +1,19 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Parking Event Map V5</title>
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
+  <title>Parking Event Map V6</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="topbar no-print">
     <div>
       <h1>Parking Event Map</h1>
-      <p class="subtitle">Satellite map, event area marking, and print-ready page for tiagofontana.us/lab/test2</p>
+      <p class="subtitle">Satellite map, event area marking, and print-ready layout for tiagofontana.us/lab/test2</p>
     </div>
     <div class="header-actions">
       <button id="printBtn" class="btn">Print</button>
@@ -31,7 +28,7 @@
         <div class="panel-title-row">
           <h2>Satellite Map</h2>
           <div class="search-row no-print">
-            <input id="mapSearchInput" type="text" placeholder="Search school, building, address, or parking lot">
+            <input id="mapSearchInput" type="text" value="New England Tech East Greenwich" placeholder="Search school, building, address, or parking lot">
             <button id="mapSearchBtn" class="btn">Search</button>
           </div>
         </div>
@@ -52,7 +49,7 @@
           <div class="field-grid">
             <label>
               <span>Event Title</span>
-              <input id="eventTitle" type="text" placeholder="Example: Open House Parking">
+              <input id="eventTitle" type="text" placeholder="Example: Student Event Parking">
             </label>
 
             <label>
@@ -62,7 +59,7 @@
 
             <label>
               <span>Location Name</span>
-              <input id="locationName" type="text" placeholder="Example: Main Campus Lot">
+              <input id="locationName" type="text" placeholder="Example: East Greenwich Campus">
             </label>
 
             <label>
@@ -73,7 +70,7 @@
 
           <label>
             <span>Information / Instructions</span>
-            <textarea id="eventNotes" rows="5" placeholder="Add directions, arrival notes, parking rules, or any information people should read."></textarea>
+            <textarea id="eventNotes" rows="6" placeholder="Add directions, arrival notes, parking rules, or any information people should read."></textarea>
           </label>
 
           <label class="no-print">
@@ -82,8 +79,36 @@
           </label>
 
           <div class="reference-image-wrap">
-            <img id="referenceImage" class="reference-image hidden" alt="Reference image">
-            <div id="referenceImageEmpty" class="reference-empty">No reference image uploaded yet.</div>
+            <img id="referenceImage" class="reference-image" alt="Reference image">
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title-row">
+            <h2>Campus Map Reference</h2>
+          </div>
+
+          <div class="legend-card">
+            <div class="legend-title">Parking Lots</div>
+            <ul class="legend-list">
+              <li>A-1</li>
+              <li>A-2</li>
+              <li>B</li>
+              <li>C-1</li>
+              <li>C-2</li>
+              <li>D</li>
+            </ul>
+          </div>
+
+          <div class="legend-card">
+            <div class="legend-title">Campus Legend</div>
+            <ol class="legend-list ordered">
+              <li>Richard I. Gouse Building</li>
+              <li>Kurn Student Center</li>
+              <li>Meltzer Hall</li>
+              <li>Basketball Courts</li>
+              <li>Sports Fields</li>
+            </ol>
           </div>
         </section>
 
@@ -92,7 +117,7 @@
             <h2>Marked Areas</h2>
           </div>
           <div id="areaList" class="area-list"></div>
-          <p class="small-note">Click a rectangle on the map to view or edit its label and notes.</p>
+          <p class="small-note">Click a rectangle on the map to edit its label and notes.</p>
         </section>
 
         <section class="panel print-panel">
@@ -117,9 +142,8 @@
     Parking Event Map Created by Tiago Fontana © 2026
   </footer>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
