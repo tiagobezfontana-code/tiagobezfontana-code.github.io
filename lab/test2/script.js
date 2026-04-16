@@ -1,19 +1,22 @@
 
-const STORAGE_KEY = "parking-manager-v2";
+const STORAGE_KEY = "parking-manager-v3";
 
 const defaultData = {
-  buildingName: "Campus Parking Lot",
-  buildingMapUrl: "https://maps.google.com/?q=Roger+Williams+University",
+  mapQuery: "Roger Williams University parking lot",
+  mapUrl: "https://maps.google.com/?q=Roger+Williams+University+parking+lot",
   rows: 4,
   cols: 6,
+  lotImageData: "",
   spaces: []
 };
 
 let state = loadState();
+let selectedSpaceId = null;
 
 const refs = {
-  buildingName: document.getElementById("buildingName"),
-  buildingMapUrl: document.getElementById("buildingMapUrl"),
+  mapQuery: document.getElementById("mapQuery"),
+  mapUrlInput: document.getElementById("mapUrlInput"),
+  mapFrame: document.getElementById("mapFrame"),
   openMapLink: document.getElementById("openMapLink"),
   rowsInput: document.getElementById("rowsInput"),
   colsInput: document.getElementById("colsInput"),
@@ -28,9 +31,10 @@ const refs = {
   spaceNotes: document.getElementById("spaceNotes"),
   reservationTableBody: document.getElementById("reservationTableBody"),
   searchInput: document.getElementById("searchInput"),
+  lotImageInput: document.getElementById("lotImageInput"),
+  lotImagePreview: document.getElementById("lotImagePreview"),
+  noImageState: document.getElementById("noImageState")
 };
-
-let selectedSpaceId = null;
 
 initialize();
 
@@ -41,43 +45,25 @@ function initialize(){
     persist();
   }
 
-  bindTopControls();
-  renderBuilding();
-  renderLot();
-  renderTable();
-}
-
-function loadState(){
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) return structuredClone(defaultData);
-  try{
-    const parsed = JSON.parse(saved);
-    return {
-      ...structuredClone(defaultData),
-      ...parsed,
-      spaces: Array.isArray(parsed.spaces) ? parsed.spaces : []
-    };
-  }catch{
-    return structuredClone(defaultData);
-  }
-}
-
-function persist(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
-
-function bindTopControls(){
-  refs.buildingName.value = state.buildingName || "";
-  refs.buildingMapUrl.value = state.buildingMapUrl || "";
+  refs.mapQuery.value = state.mapQuery || "";
+  refs.mapUrlInput.value = state.mapUrl || "";
   refs.rowsInput.value = state.rows;
   refs.colsInput.value = state.cols;
 
-  document.getElementById("saveBuildingBtn").addEventListener("click", () => {
-    state.buildingName = refs.buildingName.value.trim() || "Untitled Building";
-    state.buildingMapUrl = refs.buildingMapUrl.value.trim() || "#";
+  bindEvents();
+  renderMap();
+  renderImagePreview();
+  renderLot();
+  renderForm();
+  renderTable();
+}
+
+function bindEvents(){
+  document.getElementById("loadMapBtn").addEventListener("click", () => {
+    state.mapQuery = refs.mapQuery.value.trim();
+    state.mapUrl = refs.mapUrlInput.value.trim();
     persist();
-    renderBuilding();
-    alert("Building information saved.");
+    renderMap();
   });
 
   document.getElementById("generateLotBtn").addEventListener("click", () => {
@@ -100,11 +86,13 @@ function bindTopControls(){
     seedDemoReservations();
     selectedSpaceId = null;
     persist();
-    refs.buildingName.value = state.buildingName;
-    refs.buildingMapUrl.value = state.buildingMapUrl;
+    refs.mapQuery.value = state.mapQuery;
+    refs.mapUrlInput.value = state.mapUrl;
     refs.rowsInput.value = state.rows;
     refs.colsInput.value = state.cols;
-    renderBuilding();
+    refs.lotImageInput.value = "";
+    renderMap();
+    renderImagePreview();
     renderLot();
     renderForm();
     renderTable();
@@ -113,6 +101,8 @@ function bindTopControls(){
   document.getElementById("exportBtn").addEventListener("click", exportData);
   document.getElementById("clearSpaceBtn").addEventListener("click", clearSelectedSpace);
   refs.searchInput.addEventListener("input", renderTable);
+
+  refs.lotImageInput.addEventListener("change", handleImageUpload);
 
   refs.spaceForm.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -132,8 +122,65 @@ function bindTopControls(){
   });
 }
 
-function renderBuilding(){
-  refs.openMapLink.href = state.buildingMapUrl || "#";
+function loadState(){
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (!saved) return structuredClone(defaultData);
+
+  try{
+    const parsed = JSON.parse(saved);
+    return {
+      ...structuredClone(defaultData),
+      ...parsed,
+      spaces: Array.isArray(parsed.spaces) ? parsed.spaces : []
+    };
+  }catch{
+    return structuredClone(defaultData);
+  }
+}
+
+function persist(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function renderMap(){
+  const query = (state.mapQuery || "").trim();
+  const url = (state.mapUrl || "").trim();
+
+  if (url){
+    refs.openMapLink.href = url;
+  } else if (query){
+    refs.openMapLink.href = "https://maps.google.com/?q=" + encodeURIComponent(query);
+  } else {
+    refs.openMapLink.href = "#";
+  }
+
+  const embedQuery = query || "Roger Williams University parking lot";
+  refs.mapFrame.src = "https://maps.google.com/maps?q=" + encodeURIComponent(embedQuery) + "&t=&z=17&ie=UTF8&iwloc=&output=embed";
+}
+
+function handleImageUpload(event){
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    state.lotImageData = reader.result;
+    persist();
+    renderImagePreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderImagePreview(){
+  if (state.lotImageData){
+    refs.lotImagePreview.src = state.lotImageData;
+    refs.lotImagePreview.classList.remove("hidden");
+    refs.noImageState.classList.add("hidden");
+  } else {
+    refs.lotImagePreview.removeAttribute("src");
+    refs.lotImagePreview.classList.add("hidden");
+    refs.noImageState.classList.remove("hidden");
+  }
 }
 
 function generateSpaces(rows, cols){
@@ -166,9 +213,7 @@ function seedDemoReservations(){
 
   examples.forEach(example => {
     const space = state.spaces.find(item => item.id === example.id);
-    if (space){
-      Object.assign(space, example);
-    }
+    if (space) Object.assign(space, example);
   });
 }
 
@@ -219,7 +264,6 @@ function renderForm(){
 
   refs.noSelectionState.classList.add("hidden");
   refs.spaceForm.classList.remove("hidden");
-
   refs.selectedSpaceTitle.textContent = `Space ${space.id}`;
   refs.spaceStatus.value = space.status;
   refs.assignedTo.value = space.assignedTo || "";
@@ -238,7 +282,6 @@ function clearSelectedSpace(){
   space.licensePlate = "";
   space.permitNumber = "";
   space.notes = "";
-
   persist();
   renderLot();
   renderForm();
@@ -262,7 +305,6 @@ function renderTable(){
   });
 
   refs.reservationTableBody.innerHTML = "";
-
   filtered.forEach(space => {
     const row = document.createElement("tr");
     row.innerHTML = `
@@ -281,14 +323,12 @@ function exportData(){
   const dataStr = JSON.stringify(state, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
   const url = URL.createObjectURL(blob);
-
   const link = document.createElement("a");
   link.href = url;
   link.download = "parking-lot-data.json";
   document.body.appendChild(link);
   link.click();
   link.remove();
-
   URL.revokeObjectURL(url);
 }
 
@@ -317,20 +357,3 @@ function escapeHtml(value){
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
 }
-
-const lot = document.getElementById("lot")
-
-for(let i=1;i<=20;i++){
-
-const space=document.createElement("div")
-space.className="space"
-space.innerText="P"+i
-
-space.onclick=()=>{
-space.classList.toggle("reserved")
-}
-
-lot.appendChild(space)
-
-}
-
