@@ -2,47 +2,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Parking Lot Manager</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parking Event Map V5</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+  <header class="topbar no-print">
+    <div>
+      <h1>Parking Event Map</h1>
+      <p class="subtitle">Satellite map, event area marking, and print-ready page for tiagofontana.us/lab/test2</p>
+    </div>
+    <div class="header-actions">
+      <button id="printBtn" class="btn">Print</button>
+      <button id="resetBtn" class="btn btn-secondary">Reset Demo</button>
+      <button id="exportBtn" class="btn btn-secondary">Export Data</button>
+    </div>
+  </header>
 
-<header>
-Parking Lot Reservation System
-</header>
+  <main class="page">
+    <section class="layout-main">
+      <section class="panel map-panel">
+        <div class="panel-title-row">
+          <h2>Satellite Map</h2>
+          <div class="search-row no-print">
+            <input id="mapSearchInput" type="text" placeholder="Search school, building, address, or parking lot">
+            <button id="mapSearchBtn" class="btn">Search</button>
+          </div>
+        </div>
 
-<div class="container">
+        <div id="map" class="map"></div>
 
-<h3>Building Location</h3>
+        <div class="map-help no-print">
+          Use the mouse to move and zoom. Use the rectangle tool on the left side of the map to mark the event area.
+        </div>
+      </section>
 
-<div class="map">
-<iframe
-width="100%"
-height="100%"
-frameborder="0"
-style="border:0"
-src="https://maps.google.com/maps?q=Roger%20Williams%20University&t=&z=16&ie=UTF8&iwloc=&output=embed">
-</iframe>
-</div>
+      <aside class="sidebar">
+        <section class="panel info-panel">
+          <div class="panel-title-row">
+            <h2>Event Information</h2>
+          </div>
 
-<h3>Parking Lot Layout</h3>
+          <div class="field-grid">
+            <label>
+              <span>Event Title</span>
+              <input id="eventTitle" type="text" placeholder="Example: Open House Parking">
+            </label>
 
-<div class="parking-lot" id="lot"></div>
+            <label>
+              <span>Date</span>
+              <input id="eventDate" type="text" placeholder="Example: May 8, 2026">
+            </label>
 
-<div class="legend">
-<span class="open">■ Open</span>
-<span class="reserved">■ Reserved</span>
-</div>
+            <label>
+              <span>Location Name</span>
+              <input id="locationName" type="text" placeholder="Example: Main Campus Lot">
+            </label>
 
-</div>
+            <label>
+              <span>Contact</span>
+              <input id="contactName" type="text" placeholder="Example: Public Safety Office">
+            </label>
+          </div>
 
-<footer>
-Prototype Test — tiagofontana.us/lab/test2
-</footer>
+          <label>
+            <span>Information / Instructions</span>
+            <textarea id="eventNotes" rows="5" placeholder="Add directions, arrival notes, parking rules, or any information people should read."></textarea>
+          </label>
 
-<script src="script.js"></script>
+          <label class="no-print">
+            <span>Upload reference image</span>
+            <input id="referenceImageInput" type="file" accept="image/*">
+          </label>
 
+          <div class="reference-image-wrap">
+            <img id="referenceImage" class="reference-image hidden" alt="Reference image">
+            <div id="referenceImageEmpty" class="reference-empty">No reference image uploaded yet.</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title-row">
+            <h2>Marked Areas</h2>
+          </div>
+          <div id="areaList" class="area-list"></div>
+          <p class="small-note">Click a rectangle on the map to view or edit its label and notes.</p>
+        </section>
+
+        <section class="panel print-panel">
+          <div class="panel-title-row">
+            <h2>Print View</h2>
+          </div>
+
+          <div class="print-card">
+            <h3 id="printEventTitle">Event Map</h3>
+            <p><strong>Date:</strong> <span id="printEventDate">-</span></p>
+            <p><strong>Location:</strong> <span id="printLocationName">-</span></p>
+            <p><strong>Contact:</strong> <span id="printContactName">-</span></p>
+            <p><strong>Notes:</strong></p>
+            <div id="printEventNotes" class="notes-box">-</div>
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Parking Event Map Created by Tiago Fontana © 2026
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
