@@ -1,15 +1,15 @@
 
-const STORAGE_KEY = "parking-event-map-v5";
+const STORAGE_KEY = "parking-event-map-v6";
 
 const defaultState = {
-  mapCenter: [41.6770, -71.2662],
+  mapCenter: [41.6770, -71.2639],
   mapZoom: 18,
-  eventTitle: "Event Parking Map",
+  eventTitle: "Student Parking Map",
   eventDate: "",
-  locationName: "",
+  locationName: "East Greenwich Campus",
   contactName: "",
-  eventNotes: "",
-  referenceImageData: "",
+  eventNotes: "Student Parking Highlighted in Yellow\n\nStudents should NOT park in Lot A1 — which is in the front of the Main building",
+  referenceImageData: "assets/east-greenwich-campus-reference.jpeg",
   areas: []
 };
 
@@ -26,7 +26,6 @@ const refs = {
   eventNotes: document.getElementById("eventNotes"),
   referenceImageInput: document.getElementById("referenceImageInput"),
   referenceImage: document.getElementById("referenceImage"),
-  referenceImageEmpty: document.getElementById("referenceImageEmpty"),
   areaList: document.getElementById("areaList"),
   printEventTitle: document.getElementById("printEventTitle"),
   printEventDate: document.getElementById("printEventDate"),
@@ -35,7 +34,7 @@ const refs = {
   printEventNotes: document.getElementById("printEventNotes")
 };
 
-initialize();
+document.addEventListener("DOMContentLoaded", initialize);
 
 function initialize(){
   fillForm();
@@ -45,6 +44,9 @@ function initialize(){
   renderReferenceImage();
   renderAreaList();
   renderPrintCard();
+
+  setTimeout(() => { if (map) map.invalidateSize(); }, 350);
+  setTimeout(searchLocation, 600);
 }
 
 function bindEvents(){
@@ -55,18 +57,11 @@ function bindEvents(){
       searchLocation();
     }
   });
-
   document.getElementById("printBtn").addEventListener("click", () => window.print());
   document.getElementById("exportBtn").addEventListener("click", exportData);
   document.getElementById("resetBtn").addEventListener("click", resetDemo);
 
-  [
-    refs.eventTitle,
-    refs.eventDate,
-    refs.locationName,
-    refs.contactName,
-    refs.eventNotes
-  ].forEach(input => {
+  [refs.eventTitle, refs.eventDate, refs.locationName, refs.contactName, refs.eventNotes].forEach(input => {
     input.addEventListener("input", syncFormToState);
   });
 
@@ -92,31 +87,24 @@ function syncFormToState(){
 }
 
 function initMap(){
-  map = L.map("map").setView(state.mapCenter, state.mapZoom);
+  map = L.map("map", { zoomControl: true, preferCanvas: true }).setView(state.mapCenter, state.mapZoom);
 
-  const imagery = L.tileLayer(
+  L.tileLayer(
     "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    {
-      maxZoom: 20,
-      attribution: "Tiles © Esri"
-    }
+    { maxZoom: 20, attribution: "Tiles © Esri" }
   ).addTo(map);
 
-  const labels = L.tileLayer(
+  L.tileLayer(
     "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
-    {
-      maxZoom: 20,
-      attribution: "Labels © Esri"
-    }
+    { maxZoom: 20, attribution: "Labels © Esri" }
   ).addTo(map);
 
   drawnItems = new L.FeatureGroup();
   map.addLayer(drawnItems);
 
   const drawControl = new L.Control.Draw({
-    edit: {
-      featureGroup: drawnItems
-    },
+    position: "topleft",
+    edit: { featureGroup: drawnItems },
     draw: {
       polyline: false,
       polygon: false,
@@ -125,42 +113,32 @@ function initMap(){
       marker: false,
       rectangle: {
         shapeOptions: {
-          color: "#ff3b30",
-          weight: 2
+          color: "#ffd400",
+          weight: 2,
+          fillColor: "#ffd400",
+          fillOpacity: 0.28
         }
       }
     }
   });
   map.addControl(drawControl);
 
-  map.on(L.Draw.Event.CREATED, function (event) {
+  map.on(L.Draw.Event.CREATED, function(event){
     const layer = event.layer;
-    const data = askAreaDetails({
-      name: "Event Area",
-      notes: ""
-    });
+    const details = askAreaDetails({ name: "Event Parking Area", notes: "" });
     layer.feature = {
       type: "Feature",
-      properties: {
-        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
-        name: data.name,
-        notes: data.notes
-      },
+      properties: { id: generateId(), name: details.name, notes: details.notes },
       geometry: layer.toGeoJSON().geometry
     };
-
+    styleArea(layer);
     attachAreaHandlers(layer);
     drawnItems.addLayer(layer);
     saveAreasFromMap();
   });
 
-  map.on(L.Draw.Event.EDITED, function () {
-    saveAreasFromMap();
-  });
-
-  map.on(L.Draw.Event.DELETED, function () {
-    saveAreasFromMap();
-  });
+  map.on(L.Draw.Event.EDITED, saveAreasFromMap);
+  map.on(L.Draw.Event.DELETED, saveAreasFromMap);
 
   map.on("moveend zoomend", () => {
     const center = map.getCenter();
@@ -170,41 +148,47 @@ function initMap(){
   });
 }
 
-function attachAreaHandlers(layer){
-  layer.on("click", () => {
-    const current = layer.feature?.properties || { name: "Event Area", notes: "" };
-    const updated = askAreaDetails(current);
-    if (!updated) return;
-    layer.feature.properties.name = updated.name;
-    layer.feature.properties.notes = updated.notes;
-    layer.bindPopup(buildPopupHtml(layer.feature.properties));
-    saveAreasFromMap();
-  });
+function styleArea(layer){
+  if (layer.setStyle){
+    layer.setStyle({
+      color: "#ffd400",
+      weight: 2,
+      fillColor: "#ffd400",
+      fillOpacity: 0.28
+    });
+  }
+}
 
+function attachAreaHandlers(layer){
   if (layer.feature?.properties){
     layer.bindPopup(buildPopupHtml(layer.feature.properties));
   }
+  layer.on("click", () => {
+    const current = layer.feature?.properties || { name: "Event Parking Area", notes: "" };
+    const updated = askAreaDetails(current);
+    layer.feature.properties.name = updated.name;
+    layer.feature.properties.notes = updated.notes;
+    layer.bindPopup(buildPopupHtml(layer.feature.properties)).openPopup();
+    saveAreasFromMap();
+  });
 }
 
 function buildPopupHtml(props){
   return `
     <div>
-      <strong>${escapeHtml(props.name || "Event Area")}</strong><br>
+      <strong>${escapeHtml(props.name || "Event Parking Area")}</strong><br>
       <div style="margin-top:6px;">${escapeHtml(props.notes || "No notes")}</div>
-      <div style="margin-top:8px; font-size:12px; color:#666;">Click the rectangle again to edit its label and notes.</div>
+      <div style="margin-top:8px; font-size:12px; color:#666;">Click the rectangle again to edit the name and notes.</div>
     </div>
   `;
 }
 
 function askAreaDetails(current){
-  const name = window.prompt("Area name:", current.name || "Event Area");
-  if (name === null) return null;
+  const name = window.prompt("Area name:", current.name || "Event Parking Area");
+  if (name === null) return current;
   const notes = window.prompt("Area notes / instructions:", current.notes || "");
-  if (notes === null) return { name: name.trim() || "Event Area", notes: current.notes || "" };
-  return {
-    name: name.trim() || "Event Area",
-    notes: notes.trim()
-  };
+  if (notes === null) return { name: name.trim() || "Event Parking Area", notes: current.notes || "" };
+  return { name: name.trim() || "Event Parking Area", notes: notes.trim() };
 }
 
 async function searchLocation(){
@@ -217,17 +201,12 @@ async function searchLocation(){
     const response = await fetch(url, { headers: { "Accept": "application/json" } });
     if (!response.ok) throw new Error("Search failed");
     const results = await response.json();
-
     if (!Array.isArray(results) || results.length === 0){
       alert("Location not found.");
       return;
     }
-
     const result = results[0];
-    const lat = Number(result.lat);
-    const lon = Number(result.lon);
-
-    map.setView([lat, lon], 19);
+    map.setView([Number(result.lat), Number(result.lon)], 19);
   }catch(error){
     alert("Could not search the map right now.");
   }
@@ -237,9 +216,7 @@ function saveAreasFromMap(){
   const areas = [];
   drawnItems.eachLayer(layer => {
     const geo = layer.toGeoJSON();
-    geo.properties = {
-      ...(layer.feature?.properties || {}),
-    };
+    geo.properties = { ...(layer.feature?.properties || {}) };
     areas.push(geo);
   });
   state.areas = areas;
@@ -250,42 +227,26 @@ function saveAreasFromMap(){
 function restoreAreas(){
   drawnItems.clearLayers();
   (state.areas || []).forEach(feature => {
-    const layer = L.geoJSON(feature, {
-      style: {
-        color: "#ff3b30",
-        weight: 2
-      }
-    });
-
-    layer.eachLayer(innerLayer => {
-      innerLayer.feature = feature;
-      attachAreaHandlers(innerLayer);
-      drawnItems.addLayer(innerLayer);
+    const collection = L.geoJSON(feature);
+    collection.eachLayer(layer => {
+      layer.feature = feature;
+      styleArea(layer);
+      attachAreaHandlers(layer);
+      drawnItems.addLayer(layer);
     });
   });
-
-  if (drawnItems.getLayers().length){
-    try{
-      map.fitBounds(drawnItems.getBounds().pad(0.2));
-    }catch{}
-  }
 }
 
 function renderAreaList(){
   refs.areaList.innerHTML = "";
-
   if (!state.areas || state.areas.length === 0){
-    refs.areaList.innerHTML = '<div class="area-item"><h4>No marked areas yet</h4><p>Use the rectangle tool on the map to mark the event location.</p></div>';
+    refs.areaList.innerHTML = '<div class="area-item"><h4>No marked areas yet</h4><p>Use the rectangle tool on the map to mark the event area.</p></div>';
     return;
   }
-
   state.areas.forEach(area => {
     const item = document.createElement("div");
     item.className = "area-item";
-    item.innerHTML = `
-      <h4>${escapeHtml(area.properties?.name || "Event Area")}</h4>
-      <p>${escapeHtml(area.properties?.notes || "No notes")}</p>
-    `;
+    item.innerHTML = `<h4>${escapeHtml(area.properties?.name || "Event Parking Area")}</h4><p>${escapeHtml(area.properties?.notes || "No notes")}</p>`;
     refs.areaList.appendChild(item);
   });
 }
@@ -293,7 +254,6 @@ function renderAreaList(){
 function handleReferenceImageUpload(event){
   const file = event.target.files && event.target.files[0];
   if (!file) return;
-
   const reader = new FileReader();
   reader.onload = () => {
     state.referenceImageData = reader.result;
@@ -304,15 +264,7 @@ function handleReferenceImageUpload(event){
 }
 
 function renderReferenceImage(){
-  if (state.referenceImageData){
-    refs.referenceImage.src = state.referenceImageData;
-    refs.referenceImage.classList.remove("hidden");
-    refs.referenceImageEmpty.classList.add("hidden");
-  } else {
-    refs.referenceImage.removeAttribute("src");
-    refs.referenceImage.classList.add("hidden");
-    refs.referenceImageEmpty.classList.remove("hidden");
-  }
+  refs.referenceImage.src = state.referenceImageData || "assets/east-greenwich-campus-reference.jpeg";
 }
 
 function renderPrintCard(){
@@ -324,8 +276,7 @@ function renderPrintCard(){
 }
 
 function exportData(){
-  const dataStr = JSON.stringify(state, null, 2);
-  const blob = new Blob([dataStr], { type: "application/json" });
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -340,26 +291,28 @@ function resetDemo(){
   state = structuredClone(defaultState);
   persist();
   fillForm();
-  renderPrintCard();
   renderReferenceImage();
+  renderPrintCard();
   if (drawnItems) drawnItems.clearLayers();
-  map.setView(state.mapCenter, state.mapZoom);
-  refs.mapSearchInput.value = "";
-  refs.referenceImageInput.value = "";
   renderAreaList();
+  refs.mapSearchInput.value = "New England Tech East Greenwich";
+  refs.referenceImageInput.value = "";
+  if (map){
+    map.setView(state.mapCenter, state.mapZoom);
+    setTimeout(searchLocation, 300);
+  }
+}
+
+function generateId(){
+  return "area-" + Math.random().toString(36).slice(2, 10);
 }
 
 function loadState(){
   const saved = localStorage.getItem(STORAGE_KEY);
   if (!saved) return structuredClone(defaultState);
-
   try{
     const parsed = JSON.parse(saved);
-    return {
-      ...structuredClone(defaultState),
-      ...parsed,
-      areas: Array.isArray(parsed.areas) ? parsed.areas : []
-    };
+    return { ...structuredClone(defaultState), ...parsed, areas: Array.isArray(parsed.areas) ? parsed.areas : [] };
   }catch{
     return structuredClone(defaultState);
   }
