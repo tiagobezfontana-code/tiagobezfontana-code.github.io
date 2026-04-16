@@ -4,56 +4,96 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Parking Lot Manager V2</title>
+  <title>Parking Lot Manager V3</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="topbar">
     <div>
       <h1>Parking Lot Manager</h1>
-      <p class="subtitle">Test project for tiagofontana.us/lab/test2</p>
+      <p class="subtitle">Map view + lot image upload for tiagofontana.us/lab/test2</p>
     </div>
     <div class="header-actions">
-      <button id="resetDemoBtn" class="btn btn-secondary">Reset Demo Data</button>
+      <button id="resetDemoBtn" class="btn btn-secondary">Reset Demo</button>
       <button id="exportBtn" class="btn">Export Data</button>
     </div>
   </header>
 
   <main class="page">
-    <section class="panel building-panel">
-      <h2>Building</h2>
+    <section class="panel">
+      <div class="panel-title-row">
+        <h2>Location Reference</h2>
+      </div>
+
       <div class="form-grid">
         <label>
-          <span>Building Name</span>
-          <input id="buildingName" type="text" placeholder="Example: Main Campus Garage">
+          <span>Building / Search</span>
+          <input id="mapQuery" type="text" placeholder="Example: Roger Williams University parking lot">
         </label>
+
         <label>
-          <span>Google Maps URL</span>
-          <input id="buildingMapUrl" type="url" placeholder="Paste Google Maps link here">
+          <span>Google Maps URL (optional)</span>
+          <input id="mapUrlInput" type="url" placeholder="Paste a full Google Maps link here">
         </label>
       </div>
+
       <div class="panel-row">
-        <button id="saveBuildingBtn" class="btn">Save Building Info</button>
-        <a id="openMapLink" class="btn btn-secondary" href="#" target="_blank" rel="noopener noreferrer">Open Google Maps</a>
+        <button id="loadMapBtn" class="btn">Load Map</button>
+        <a id="openMapLink" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">Open in Google Maps</a>
       </div>
-      <p class="small-note">Tip: paste the Google Maps link for the building. This version uses the link as a reference while you manage the parking spaces below.</p>
+
+      <div class="map-frame-wrap">
+        <iframe id="mapFrame" class="map-frame" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+
+      <p class="small-note">
+        You can either search for the location directly on the page or paste a Google Maps URL. The map stays visible like the first version.
+      </p>
     </section>
 
     <section class="layout">
-      <section class="panel lot-panel">
+      <section class="panel">
         <div class="panel-title-row">
-          <h2>Parking Layout</h2>
-          <div class="panel-row compact">
-            <label class="inline-field">
-              <span>Rows</span>
-              <input id="rowsInput" type="number" min="1" max="12" value="4">
-            </label>
-            <label class="inline-field">
-              <span>Columns</span>
-              <input id="colsInput" type="number" min="1" max="12" value="6">
-            </label>
-            <button id="generateLotBtn" class="btn btn-secondary">Generate Layout</button>
+          <h2>Parking Lot Image</h2>
+        </div>
+
+        <div class="form-grid image-grid">
+          <label class="upload-box">
+            <span>Upload parking lot image</span>
+            <input id="lotImageInput" type="file" accept="image/*">
+          </label>
+
+          <div class="image-preview-card">
+            <div class="preview-title">Image Preview</div>
+            <div class="image-preview-wrap">
+              <img id="lotImagePreview" class="lot-image-preview hidden" alt="Parking lot preview">
+              <div id="noImageState" class="empty-preview">No image uploaded yet.</div>
+            </div>
           </div>
+        </div>
+
+        <p class="small-note">
+          This is useful if you want to upload a screenshot or image from Google Maps and use it as the parking lot reference.
+        </p>
+      </section>
+
+      <aside class="panel">
+        <h2>Layout Setup</h2>
+
+        <div class="panel-row compact">
+          <label class="inline-field">
+            <span>Rows</span>
+            <input id="rowsInput" type="number" min="1" max="12" value="4">
+          </label>
+
+          <label class="inline-field">
+            <span>Columns</span>
+            <input id="colsInput" type="number" min="1" max="12" value="6">
+          </label>
+        </div>
+
+        <div class="panel-row">
+          <button id="generateLotBtn" class="btn">Generate Layout</button>
         </div>
 
         <div class="legend">
@@ -64,8 +104,15 @@
           <div><span class="legend-box handicap"></span> Handicap</div>
           <div><span class="legend-box blocked"></span> Blocked</div>
         </div>
+      </aside>
+    </section>
 
-        <div id="lotGrid" class="lot-grid" aria-label="Parking lot"></div>
+    <section class="layout">
+      <section class="panel lot-panel">
+        <div class="panel-title-row">
+          <h2>Parking Spaces</h2>
+        </div>
+        <div id="lotGrid" class="lot-grid" aria-label="Parking lot grid"></div>
       </section>
 
       <aside class="panel details-panel">
@@ -122,6 +169,7 @@
         <h2>Reservation List</h2>
         <input id="searchInput" class="search-input" type="text" placeholder="Search by space, name, plate, permit, or note">
       </div>
+
       <div class="table-wrap">
         <table>
           <thead>
