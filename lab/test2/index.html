@@ -2,185 +2,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Parking Lot Manager V4</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Parking Lot Manager</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <header class="topbar">
-    <div>
-      <h1>Parking Lot Manager</h1>
-      <p class="subtitle">Interactive map search + parking space manager for tiagofontana.us/lab/test2</p>
-    </div>
-    <div class="header-actions">
-      <button id="resetDemoBtn" class="btn btn-secondary">Reset Demo</button>
-      <button id="exportBtn" class="btn">Export Data</button>
-    </div>
-  </header>
 
-  <main class="page">
-    <section class="panel">
-      <div class="panel-title-row">
-        <h2>Find Location</h2>
-        <div class="search-row">
-          <input id="searchInputMap" type="text" placeholder="Search building, address, or parking lot">
-          <button id="searchMapBtn" class="btn">Search</button>
-        </div>
-      </div>
+<header>
+Parking Lot Reservation System
+</header>
 
-      <div id="map" class="map"></div>
+<div class="container">
 
-      <div class="small-note">
-        Drag with the mouse, zoom in and out, and search until you find the exact building or parking lot.
-      </div>
-    </section>
+<h3>Building Location</h3>
 
-    <section class="layout">
-      <section class="panel">
-        <div class="panel-title-row">
-          <h2>Parking Lot Image</h2>
-        </div>
+<div class="map">
+<iframe
+width="100%"
+height="100%"
+frameborder="0"
+style="border:0"
+src="https://maps.google.com/maps?q=Roger%20Williams%20University&t=&z=16&ie=UTF8&iwloc=&output=embed">
+</iframe>
+</div>
 
-        <div class="form-grid image-grid">
-          <label class="upload-box">
-            <span>Upload parking lot image or screenshot</span>
-            <input id="lotImageInput" type="file" accept="image/*">
-          </label>
+<h3>Parking Lot Layout</h3>
 
-          <div class="image-preview-card">
-            <div class="preview-title">Image Preview</div>
-            <div class="image-preview-wrap">
-              <img id="lotImagePreview" class="lot-image-preview hidden" alt="Parking lot preview">
-              <div id="noImageState" class="empty-preview">No image uploaded yet.</div>
-            </div>
-          </div>
-        </div>
+<div class="parking-lot" id="lot"></div>
 
-        <p class="small-note">
-          Use this if you want to upload a screenshot of the parking lot and use it as a visual reference.
-        </p>
-      </section>
+<div class="legend">
+<span class="open">■ Open</span>
+<span class="reserved">■ Reserved</span>
+</div>
 
-      <aside class="panel">
-        <h2>Layout Setup</h2>
+</div>
 
-        <div class="panel-row compact">
-          <label class="inline-field">
-            <span>Rows</span>
-            <input id="rowsInput" type="number" min="1" max="12" value="4">
-          </label>
+<footer>
+Prototype Test — tiagofontana.us/lab/test2
+</footer>
 
-          <label class="inline-field">
-            <span>Columns</span>
-            <input id="colsInput" type="number" min="1" max="12" value="6">
-          </label>
-        </div>
+<script src="script.js"></script>
 
-        <div class="panel-row">
-          <button id="generateLotBtn" class="btn">Generate Layout</button>
-        </div>
-
-        <div class="legend">
-          <div><span class="legend-box open"></span> Open</div>
-          <div><span class="legend-box reserved"></span> Reserved</div>
-          <div><span class="legend-box visitor"></span> Visitor</div>
-          <div><span class="legend-box staff"></span> Staff</div>
-          <div><span class="legend-box handicap"></span> Handicap</div>
-          <div><span class="legend-box blocked"></span> Blocked</div>
-        </div>
-      </aside>
-    </section>
-
-    <section class="layout">
-      <section class="panel lot-panel">
-        <div class="panel-title-row">
-          <h2>Parking Spaces</h2>
-        </div>
-        <div id="lotGrid" class="lot-grid" aria-label="Parking lot grid"></div>
-      </section>
-
-      <aside class="panel details-panel">
-        <h2>Space Details</h2>
-        <div id="noSelectionState" class="empty-state">
-          Click a parking space to edit it.
-        </div>
-
-        <form id="spaceForm" class="hidden">
-          <div class="selected-space-title" id="selectedSpaceTitle">Space P1</div>
-
-          <label>
-            <span>Status</span>
-            <select id="spaceStatus">
-              <option value="open">Open</option>
-              <option value="reserved">Reserved</option>
-              <option value="visitor">Visitor</option>
-              <option value="staff">Staff</option>
-              <option value="handicap">Handicap</option>
-              <option value="blocked">Blocked</option>
-            </select>
-          </label>
-
-          <label>
-            <span>Assigned To</span>
-            <input id="assignedTo" type="text" placeholder="Person name">
-          </label>
-
-          <label>
-            <span>License Plate</span>
-            <input id="licensePlate" type="text" placeholder="ABC-1234">
-          </label>
-
-          <label>
-            <span>Permit Number</span>
-            <input id="permitNumber" type="text" placeholder="Optional permit number">
-          </label>
-
-          <label>
-            <span>Notes</span>
-            <textarea id="spaceNotes" rows="4" placeholder="Optional notes"></textarea>
-          </label>
-
-          <div class="panel-row">
-            <button type="submit" class="btn">Save Space</button>
-            <button type="button" id="clearSpaceBtn" class="btn btn-secondary">Clear Space</button>
-          </div>
-        </form>
-      </aside>
-    </section>
-
-    <section class="panel">
-      <div class="panel-title-row">
-        <h2>Reservation List</h2>
-        <input id="searchReservations" class="search-input" type="text" placeholder="Search by space, name, plate, permit, or note">
-      </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Space</th>
-              <th>Status</th>
-              <th>Assigned To</th>
-              <th>Plate</th>
-              <th>Permit</th>
-              <th>Notes</th>
-            </tr>
-          </thead>
-          <tbody id="reservationTableBody"></tbody>
-        </table>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    Parking Permit Prototype Created by Tiago Fontana © 2026
-  </footer>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="script.js"></script>
 </body>
 </html>
