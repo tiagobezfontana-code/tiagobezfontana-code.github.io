@@ -4,14 +4,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Parking Lot Manager V3</title>
+  <title>Parking Lot Manager V4</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="topbar">
     <div>
       <h1>Parking Lot Manager</h1>
-      <p class="subtitle">Map view + lot image upload for tiagofontana.us/lab/test2</p>
+      <p class="subtitle">Interactive map search + parking space manager for tiagofontana.us/lab/test2</p>
     </div>
     <div class="header-actions">
       <button id="resetDemoBtn" class="btn btn-secondary">Reset Demo</button>
@@ -22,33 +24,18 @@
   <main class="page">
     <section class="panel">
       <div class="panel-title-row">
-        <h2>Location Reference</h2>
+        <h2>Find Location</h2>
+        <div class="search-row">
+          <input id="searchInputMap" type="text" placeholder="Search building, address, or parking lot">
+          <button id="searchMapBtn" class="btn">Search</button>
+        </div>
       </div>
 
-      <div class="form-grid">
-        <label>
-          <span>Building / Search</span>
-          <input id="mapQuery" type="text" placeholder="Example: Roger Williams University parking lot">
-        </label>
+      <div id="map" class="map"></div>
 
-        <label>
-          <span>Google Maps URL (optional)</span>
-          <input id="mapUrlInput" type="url" placeholder="Paste a full Google Maps link here">
-        </label>
+      <div class="small-note">
+        Drag with the mouse, zoom in and out, and search until you find the exact building or parking lot.
       </div>
-
-      <div class="panel-row">
-        <button id="loadMapBtn" class="btn">Load Map</button>
-        <a id="openMapLink" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">Open in Google Maps</a>
-      </div>
-
-      <div class="map-frame-wrap">
-        <iframe id="mapFrame" class="map-frame" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-      </div>
-
-      <p class="small-note">
-        You can either search for the location directly on the page or paste a Google Maps URL. The map stays visible like the first version.
-      </p>
     </section>
 
     <section class="layout">
@@ -59,7 +46,7 @@
 
         <div class="form-grid image-grid">
           <label class="upload-box">
-            <span>Upload parking lot image</span>
+            <span>Upload parking lot image or screenshot</span>
             <input id="lotImageInput" type="file" accept="image/*">
           </label>
 
@@ -73,7 +60,7 @@
         </div>
 
         <p class="small-note">
-          This is useful if you want to upload a screenshot or image from Google Maps and use it as the parking lot reference.
+          Use this if you want to upload a screenshot of the parking lot and use it as a visual reference.
         </p>
       </section>
 
@@ -167,7 +154,7 @@
     <section class="panel">
       <div class="panel-title-row">
         <h2>Reservation List</h2>
-        <input id="searchInput" class="search-input" type="text" placeholder="Search by space, name, plate, permit, or note">
+        <input id="searchReservations" class="search-input" type="text" placeholder="Search by space, name, plate, permit, or note">
       </div>
 
       <div class="table-wrap">
@@ -192,6 +179,8 @@
     Parking Permit Prototype Created by Tiago Fontana © 2026
   </footer>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="script.js"></script>
 </body>
 </html>
