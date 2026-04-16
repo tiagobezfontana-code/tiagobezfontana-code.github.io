@@ -1,23 +1,22 @@
 
-const STORAGE_KEY = "parking-manager-v3";
+const STORAGE_KEY = "parking-manager-v4";
 
 const defaultData = {
-  mapQuery: "Roger Williams University parking lot",
-  mapUrl: "https://maps.google.com/?q=Roger+Williams+University+parking+lot",
   rows: 4,
   cols: 6,
   lotImageData: "",
+  mapCenter: [41.6770, -71.2662],
+  mapZoom: 17,
   spaces: []
 };
 
 let state = loadState();
 let selectedSpaceId = null;
+let map;
+let marker;
 
 const refs = {
-  mapQuery: document.getElementById("mapQuery"),
-  mapUrlInput: document.getElementById("mapUrlInput"),
-  mapFrame: document.getElementById("mapFrame"),
-  openMapLink: document.getElementById("openMapLink"),
+  searchInputMap: document.getElementById("searchInputMap"),
   rowsInput: document.getElementById("rowsInput"),
   colsInput: document.getElementById("colsInput"),
   lotGrid: document.getElementById("lotGrid"),
@@ -30,7 +29,7 @@ const refs = {
   permitNumber: document.getElementById("permitNumber"),
   spaceNotes: document.getElementById("spaceNotes"),
   reservationTableBody: document.getElementById("reservationTableBody"),
-  searchInput: document.getElementById("searchInput"),
+  searchReservations: document.getElementById("searchReservations"),
   lotImageInput: document.getElementById("lotImageInput"),
   lotImagePreview: document.getElementById("lotImagePreview"),
   noImageState: document.getElementById("noImageState")
@@ -45,13 +44,11 @@ function initialize(){
     persist();
   }
 
-  refs.mapQuery.value = state.mapQuery || "";
-  refs.mapUrlInput.value = state.mapUrl || "";
   refs.rowsInput.value = state.rows;
   refs.colsInput.value = state.cols;
 
   bindEvents();
-  renderMap();
+  createMap();
   renderImagePreview();
   renderLot();
   renderForm();
@@ -59,11 +56,12 @@ function initialize(){
 }
 
 function bindEvents(){
-  document.getElementById("loadMapBtn").addEventListener("click", () => {
-    state.mapQuery = refs.mapQuery.value.trim();
-    state.mapUrl = refs.mapUrlInput.value.trim();
-    persist();
-    renderMap();
+  document.getElementById("searchMapBtn").addEventListener("click", searchLocation);
+  refs.searchInputMap.addEventListener("keydown", (event) => {
+    if (event.key === "Enter"){
+      event.preventDefault();
+      searchLocation();
+    }
   });
 
   document.getElementById("generateLotBtn").addEventListener("click", () => {
@@ -86,12 +84,15 @@ function bindEvents(){
     seedDemoReservations();
     selectedSpaceId = null;
     persist();
-    refs.mapQuery.value = state.mapQuery;
-    refs.mapUrlInput.value = state.mapUrl;
     refs.rowsInput.value = state.rows;
     refs.colsInput.value = state.cols;
+    refs.searchInputMap.value = "";
     refs.lotImageInput.value = "";
-    renderMap();
+    map.setView(state.mapCenter, state.mapZoom);
+    if (marker) {
+      map.removeLayer(marker);
+      marker = null;
+    }
     renderImagePreview();
     renderLot();
     renderForm();
@@ -100,8 +101,7 @@ function bindEvents(){
 
   document.getElementById("exportBtn").addEventListener("click", exportData);
   document.getElementById("clearSpaceBtn").addEventListener("click", clearSelectedSpace);
-  refs.searchInput.addEventListener("input", renderTable);
-
+  refs.searchReservations.addEventListener("input", renderTable);
   refs.lotImageInput.addEventListener("change", handleImageUpload);
 
   refs.spaceForm.addEventListener("submit", (event) => {
@@ -122,40 +122,61 @@ function bindEvents(){
   });
 }
 
-function loadState(){
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) return structuredClone(defaultData);
+function createMap(){
+  map = L.map("map").setView(state.mapCenter, state.mapZoom);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 20,
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(map);
+
+  map.on("moveend zoomend", () => {
+    const center = map.getCenter();
+    state.mapCenter = [center.lat, center.lng];
+    state.mapZoom = map.getZoom();
+    persist();
+  });
+
+  map.on("click", (event) => {
+    placeMarker(event.latlng.lat, event.latlng.lng, "Selected location");
+  });
+}
+
+async function searchLocation(){
+  const query = refs.searchInputMap.value.trim();
+  if (!query) return;
+
+  const url = "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=" + encodeURIComponent(query);
 
   try{
-    const parsed = JSON.parse(saved);
-    return {
-      ...structuredClone(defaultData),
-      ...parsed,
-      spaces: Array.isArray(parsed.spaces) ? parsed.spaces : []
-    };
-  }catch{
-    return structuredClone(defaultData);
+    const response = await fetch(url, {
+      headers: {
+        "Accept": "application/json"
+      }
+    });
+    if (!response.ok) throw new Error("Search failed");
+
+    const results = await response.json();
+    if (!Array.isArray(results) || results.length === 0){
+      alert("Location not found.");
+      return;
+    }
+
+    const result = results[0];
+    const lat = Number(result.lat);
+    const lon = Number(result.lon);
+
+    map.setView([lat, lon], 18);
+    placeMarker(lat, lon, result.display_name || query);
+  }catch(error){
+    alert("Could not search the map right now.");
   }
 }
 
-function persist(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
-
-function renderMap(){
-  const query = (state.mapQuery || "").trim();
-  const url = (state.mapUrl || "").trim();
-
-  if (url){
-    refs.openMapLink.href = url;
-  } else if (query){
-    refs.openMapLink.href = "https://maps.google.com/?q=" + encodeURIComponent(query);
-  } else {
-    refs.openMapLink.href = "#";
-  }
-
-  const embedQuery = query || "Roger Williams University parking lot";
-  refs.mapFrame.src = "https://maps.google.com/maps?q=" + encodeURIComponent(embedQuery) + "&t=&z=17&ie=UTF8&iwloc=&output=embed";
+function placeMarker(lat, lon, label){
+  if (marker) map.removeLayer(marker);
+  marker = L.marker([lat, lon]).addTo(map);
+  marker.bindPopup(label).openPopup();
 }
 
 function handleImageUpload(event){
@@ -181,6 +202,26 @@ function renderImagePreview(){
     refs.lotImagePreview.classList.add("hidden");
     refs.noImageState.classList.remove("hidden");
   }
+}
+
+function loadState(){
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (!saved) return structuredClone(defaultData);
+
+  try{
+    const parsed = JSON.parse(saved);
+    return {
+      ...structuredClone(defaultData),
+      ...parsed,
+      spaces: Array.isArray(parsed.spaces) ? parsed.spaces : []
+    };
+  }catch{
+    return structuredClone(defaultData);
+  }
+}
+
+function persist(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
 function generateSpaces(rows, cols){
@@ -289,7 +330,7 @@ function clearSelectedSpace(){
 }
 
 function renderTable(){
-  const query = refs.searchInput.value.trim().toLowerCase();
+  const query = refs.searchReservations.value.trim().toLowerCase();
   const filtered = state.spaces.filter(space => {
     if (!query) return true;
     const haystack = [
