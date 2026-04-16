@@ -1,1 +1,72 @@
 
+
+body{
+font-family:Arial;
+margin:0;
+background:#f4f4f4;
+text-align:center;
+}
+
+header{
+background:#007BFF;
+color:white;
+padding:15px;
+font-size:28px;
+}
+
+.container{
+padding:20px;
+}
+
+.map{
+margin:20px auto;
+width:90%;
+max-width:800px;
+height:350px;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 3px 10px rgba(0,0,0,0.2);
+}
+
+.parking-lot{
+margin:20px auto;
+width:350px;
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:10px;
+}
+
+.space{
+height:60px;
+background:#4CAF50;
+color:white;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:6px;
+cursor:pointer;
+font-size:14px;
+}
+
+.space.reserved{
+background:#e53935;
+}
+
+.legend{
+margin-top:10px;
+}
+
+.legend .open{
+color:green;
+margin-right:10px;
+}
+
+.legend .reserved{
+color:red;
+}
+
+footer{
+margin-top:30px;
+font-size:12px;
+color:#666;
+}
