@@ -2,47 +2,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Parking Lot Manager</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parking Lot Manager V2</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+  <header class="topbar">
+    <div>
+      <h1>Parking Lot Manager</h1>
+      <p class="subtitle">Test project for tiagofontana.us/lab/test2</p>
+    </div>
+    <div class="header-actions">
+      <button id="resetDemoBtn" class="btn btn-secondary">Reset Demo Data</button>
+      <button id="exportBtn" class="btn">Export Data</button>
+    </div>
+  </header>
 
-<header>
-Parking Lot Reservation System
-</header>
+  <main class="page">
+    <section class="panel building-panel">
+      <h2>Building</h2>
+      <div class="form-grid">
+        <label>
+          <span>Building Name</span>
+          <input id="buildingName" type="text" placeholder="Example: Main Campus Garage">
+        </label>
+        <label>
+          <span>Google Maps URL</span>
+          <input id="buildingMapUrl" type="url" placeholder="Paste Google Maps link here">
+        </label>
+      </div>
+      <div class="panel-row">
+        <button id="saveBuildingBtn" class="btn">Save Building Info</button>
+        <a id="openMapLink" class="btn btn-secondary" href="#" target="_blank" rel="noopener noreferrer">Open Google Maps</a>
+      </div>
+      <p class="small-note">Tip: paste the Google Maps link for the building. This version uses the link as a reference while you manage the parking spaces below.</p>
+    </section>
 
-<div class="container">
+    <section class="layout">
+      <section class="panel lot-panel">
+        <div class="panel-title-row">
+          <h2>Parking Layout</h2>
+          <div class="panel-row compact">
+            <label class="inline-field">
+              <span>Rows</span>
+              <input id="rowsInput" type="number" min="1" max="12" value="4">
+            </label>
+            <label class="inline-field">
+              <span>Columns</span>
+              <input id="colsInput" type="number" min="1" max="12" value="6">
+            </label>
+            <button id="generateLotBtn" class="btn btn-secondary">Generate Layout</button>
+          </div>
+        </div>
 
-<h3>Building Location</h3>
+        <div class="legend">
+          <div><span class="legend-box open"></span> Open</div>
+          <div><span class="legend-box reserved"></span> Reserved</div>
+          <div><span class="legend-box visitor"></span> Visitor</div>
+          <div><span class="legend-box staff"></span> Staff</div>
+          <div><span class="legend-box handicap"></span> Handicap</div>
+          <div><span class="legend-box blocked"></span> Blocked</div>
+        </div>
 
-<div class="map">
-<iframe
-width="100%"
-height="100%"
-frameborder="0"
-style="border:0"
-src="https://maps.google.com/maps?q=Roger%20Williams%20University&t=&z=16&ie=UTF8&iwloc=&output=embed">
-</iframe>
-</div>
+        <div id="lotGrid" class="lot-grid" aria-label="Parking lot"></div>
+      </section>
 
-<h3>Parking Lot Layout</h3>
+      <aside class="panel details-panel">
+        <h2>Space Details</h2>
+        <div id="noSelectionState" class="empty-state">
+          Click a parking space to edit it.
+        </div>
 
-<div class="parking-lot" id="lot"></div>
+        <form id="spaceForm" class="hidden">
+          <div class="selected-space-title" id="selectedSpaceTitle">Space P1</div>
 
-<div class="legend">
-<span class="open">■ Open</span>
-<span class="reserved">■ Reserved</span>
-</div>
+          <label>
+            <span>Status</span>
+            <select id="spaceStatus">
+              <option value="open">Open</option>
+              <option value="reserved">Reserved</option>
+              <option value="visitor">Visitor</option>
+              <option value="staff">Staff</option>
+              <option value="handicap">Handicap</option>
+              <option value="blocked">Blocked</option>
+            </select>
+          </label>
 
-</div>
+          <label>
+            <span>Assigned To</span>
+            <input id="assignedTo" type="text" placeholder="Person name">
+          </label>
 
-<footer>
-Prototype Test — tiagofontana.us/lab/test2
-</footer>
+          <label>
+            <span>License Plate</span>
+            <input id="licensePlate" type="text" placeholder="ABC-1234">
+          </label>
 
-<script src="script.js"></script>
+          <label>
+            <span>Permit Number</span>
+            <input id="permitNumber" type="text" placeholder="Optional permit number">
+          </label>
 
+          <label>
+            <span>Notes</span>
+            <textarea id="spaceNotes" rows="4" placeholder="Optional notes"></textarea>
+          </label>
+
+          <div class="panel-row">
+            <button type="submit" class="btn">Save Space</button>
+            <button type="button" id="clearSpaceBtn" class="btn btn-secondary">Clear Space</button>
+          </div>
+        </form>
+      </aside>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title-row">
+        <h2>Reservation List</h2>
+        <input id="searchInput" class="search-input" type="text" placeholder="Search by space, name, plate, permit, or note">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Space</th>
+              <th>Status</th>
+              <th>Assigned To</th>
+              <th>Plate</th>
+              <th>Permit</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="reservationTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Parking Permit Prototype Created by Tiago Fontana © 2026
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
