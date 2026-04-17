@@ -1,5 +1,5 @@
 
-const STORAGE_KEY = "parking-event-map-v6";
+const STORAGE_KEY = "parking-event-map-v7";
 
 const defaultState = {
   mapCenter: [41.6770, -71.2639],
@@ -16,6 +16,7 @@ const defaultState = {
 let state = loadState();
 let map;
 let drawnItems;
+let selectedAreaId = null;
 
 const refs = {
   mapSearchInput: document.getElementById("mapSearchInput"),
@@ -27,6 +28,10 @@ const refs = {
   referenceImageInput: document.getElementById("referenceImageInput"),
   referenceImage: document.getElementById("referenceImage"),
   areaList: document.getElementById("areaList"),
+  noAreaSelected: document.getElementById("noAreaSelected"),
+  areaEditorForm: document.getElementById("areaEditorForm"),
+  selectedAreaName: document.getElementById("selectedAreaName"),
+  selectedAreaNotes: document.getElementById("selectedAreaNotes"),
   printEventTitle: document.getElementById("printEventTitle"),
   printEventDate: document.getElementById("printEventDate"),
   printLocationName: document.getElementById("printLocationName"),
@@ -35,6 +40,8 @@ const refs = {
 };
 
 document.addEventListener("DOMContentLoaded", initialize);
+window.addEventListener("beforeprint", handleBeforePrint);
+window.addEventListener("afterprint", handleAfterPrint);
 
 function initialize(){
   fillForm();
@@ -43,6 +50,7 @@ function initialize(){
   restoreAreas();
   renderReferenceImage();
   renderAreaList();
+  renderSelectedAreaEditor();
   renderPrintCard();
 
   setTimeout(() => { if (map) map.invalidateSize(); }, 350);
@@ -57,9 +65,24 @@ function bindEvents(){
       searchLocation();
     }
   });
-  document.getElementById("printBtn").addEventListener("click", () => window.print());
+
+  document.getElementById("printBtn").addEventListener("click", () => {
+    if (map) {
+      map.invalidateSize();
+      setTimeout(() => window.print(), 250);
+    } else {
+      window.print();
+    }
+  });
+
   document.getElementById("exportBtn").addEventListener("click", exportData);
   document.getElementById("resetBtn").addEventListener("click", resetDemo);
+  document.getElementById("deleteAreaBtn").addEventListener("click", deleteSelectedArea);
+
+  refs.areaEditorForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    saveSelectedArea();
+  });
 
   [refs.eventTitle, refs.eventDate, refs.locationName, refs.contactName, refs.eventNotes].forEach(input => {
     input.addEventListener("input", syncFormToState);
@@ -125,20 +148,37 @@ function initMap(){
 
   map.on(L.Draw.Event.CREATED, function(event){
     const layer = event.layer;
-    const details = askAreaDetails({ name: "Event Parking Area", notes: "" });
+    const areaId = generateId();
     layer.feature = {
       type: "Feature",
-      properties: { id: generateId(), name: details.name, notes: details.notes },
+      properties: {
+        id: areaId,
+        name: "Event Parking Area",
+        notes: ""
+      },
       geometry: layer.toGeoJSON().geometry
     };
-    styleArea(layer);
+    styleArea(layer, false);
     attachAreaHandlers(layer);
     drawnItems.addLayer(layer);
+    selectedAreaId = areaId;
+    saveAreasFromMap();
+    renderSelectedAreaEditor();
+    openLayerPopupById(selectedAreaId);
+  });
+
+  map.on(L.Draw.Event.EDITED, function(){
     saveAreasFromMap();
   });
 
-  map.on(L.Draw.Event.EDITED, saveAreasFromMap);
-  map.on(L.Draw.Event.DELETED, saveAreasFromMap);
+  map.on(L.Draw.Event.DELETED, function(){
+    saveAreasFromMap();
+    if (selectedAreaId && !getAreaById(selectedAreaId)) {
+      selectedAreaId = null;
+    }
+    renderSelectedAreaEditor();
+    renderAreaList();
+  });
 
   map.on("moveend zoomend", () => {
     const center = map.getCenter();
@@ -148,28 +188,27 @@ function initMap(){
   });
 }
 
-function styleArea(layer){
-  if (layer.setStyle){
-    layer.setStyle({
-      color: "#ffd400",
-      weight: 2,
-      fillColor: "#ffd400",
-      fillOpacity: 0.28
-    });
-  }
+function styleArea(layer, isSelected){
+  if (!layer.setStyle) return;
+  layer.setStyle({
+    color: isSelected ? "#ff9900" : "#ffd400",
+    weight: isSelected ? 3 : 2,
+    fillColor: "#ffd400",
+    fillOpacity: isSelected ? 0.38 : 0.28
+  });
 }
 
 function attachAreaHandlers(layer){
   if (layer.feature?.properties){
     layer.bindPopup(buildPopupHtml(layer.feature.properties));
   }
+
   layer.on("click", () => {
-    const current = layer.feature?.properties || { name: "Event Parking Area", notes: "" };
-    const updated = askAreaDetails(current);
-    layer.feature.properties.name = updated.name;
-    layer.feature.properties.notes = updated.notes;
-    layer.bindPopup(buildPopupHtml(layer.feature.properties)).openPopup();
-    saveAreasFromMap();
+    selectedAreaId = layer.feature.properties.id;
+    renderSelectedAreaEditor();
+    renderAreaList();
+    refreshAreaStyles();
+    layer.openPopup();
   });
 }
 
@@ -178,17 +217,9 @@ function buildPopupHtml(props){
     <div>
       <strong>${escapeHtml(props.name || "Event Parking Area")}</strong><br>
       <div style="margin-top:6px;">${escapeHtml(props.notes || "No notes")}</div>
-      <div style="margin-top:8px; font-size:12px; color:#666;">Click the rectangle again to edit the name and notes.</div>
+      <div style="margin-top:8px; font-size:12px; color:#666;">This area is selected. Edit its name and notes in the right panel.</div>
     </div>
   `;
-}
-
-function askAreaDetails(current){
-  const name = window.prompt("Area name:", current.name || "Event Parking Area");
-  if (name === null) return current;
-  const notes = window.prompt("Area notes / instructions:", current.notes || "");
-  if (notes === null) return { name: name.trim() || "Event Parking Area", notes: current.notes || "" };
-  return { name: name.trim() || "Event Parking Area", notes: notes.trim() };
 }
 
 async function searchLocation(){
@@ -222,6 +253,7 @@ function saveAreasFromMap(){
   state.areas = areas;
   persist();
   renderAreaList();
+  refreshAreaStyles();
 }
 
 function restoreAreas(){
@@ -230,23 +262,117 @@ function restoreAreas(){
     const collection = L.geoJSON(feature);
     collection.eachLayer(layer => {
       layer.feature = feature;
-      styleArea(layer);
+      styleArea(layer, feature.properties?.id === selectedAreaId);
       attachAreaHandlers(layer);
       drawnItems.addLayer(layer);
     });
+  });
+  refreshAreaStyles();
+}
+
+function refreshAreaStyles(){
+  drawnItems.eachLayer(layer => {
+    const isSelected = layer.feature?.properties?.id === selectedAreaId;
+    styleArea(layer, isSelected);
+    if (layer.feature?.properties){
+      layer.bindPopup(buildPopupHtml(layer.feature.properties));
+    }
+  });
+}
+
+function getAreaById(areaId){
+  return (state.areas || []).find(area => area.properties?.id === areaId) || null;
+}
+
+function renderSelectedAreaEditor(){
+  const area = getAreaById(selectedAreaId);
+
+  if (!area){
+    refs.noAreaSelected.classList.remove("hidden");
+    refs.areaEditorForm.classList.add("hidden");
+    refs.selectedAreaName.value = "";
+    refs.selectedAreaNotes.value = "";
+    return;
+  }
+
+  refs.noAreaSelected.classList.add("hidden");
+  refs.areaEditorForm.classList.remove("hidden");
+  refs.selectedAreaName.value = area.properties?.name || "";
+  refs.selectedAreaNotes.value = area.properties?.notes || "";
+}
+
+function saveSelectedArea(){
+  const area = getAreaById(selectedAreaId);
+  if (!area) return;
+
+  area.properties.name = refs.selectedAreaName.value.trim() || "Event Parking Area";
+  area.properties.notes = refs.selectedAreaNotes.value.trim();
+
+  drawnItems.eachLayer(layer => {
+    if (layer.feature?.properties?.id === selectedAreaId){
+      layer.feature.properties.name = area.properties.name;
+      layer.feature.properties.notes = area.properties.notes;
+      layer.bindPopup(buildPopupHtml(layer.feature.properties));
+    }
+  });
+
+  persist();
+  renderAreaList();
+  refreshAreaStyles();
+  openLayerPopupById(selectedAreaId);
+}
+
+function deleteSelectedArea(){
+  if (!selectedAreaId) return;
+
+  let layerToRemove = null;
+  drawnItems.eachLayer(layer => {
+    if (layer.feature?.properties?.id === selectedAreaId){
+      layerToRemove = layer;
+    }
+  });
+
+  if (layerToRemove){
+    drawnItems.removeLayer(layerToRemove);
+  }
+
+  state.areas = (state.areas || []).filter(area => area.properties?.id !== selectedAreaId);
+  selectedAreaId = null;
+  persist();
+  renderAreaList();
+  renderSelectedAreaEditor();
+}
+
+function openLayerPopupById(areaId){
+  drawnItems.eachLayer(layer => {
+    if (layer.feature?.properties?.id === areaId){
+      layer.openPopup();
+    }
   });
 }
 
 function renderAreaList(){
   refs.areaList.innerHTML = "";
+
   if (!state.areas || state.areas.length === 0){
     refs.areaList.innerHTML = '<div class="area-item"><h4>No marked areas yet</h4><p>Use the rectangle tool on the map to mark the event area.</p></div>';
     return;
   }
+
   state.areas.forEach(area => {
     const item = document.createElement("div");
-    item.className = "area-item";
-    item.innerHTML = `<h4>${escapeHtml(area.properties?.name || "Event Parking Area")}</h4><p>${escapeHtml(area.properties?.notes || "No notes")}</p>`;
+    item.className = "area-item" + (area.properties?.id === selectedAreaId ? " active" : "");
+    item.innerHTML = `
+      <h4>${escapeHtml(area.properties?.name || "Event Parking Area")}</h4>
+      <p>${escapeHtml(area.properties?.notes || "No notes")}</p>
+    `;
+    item.addEventListener("click", () => {
+      selectedAreaId = area.properties?.id || null;
+      renderSelectedAreaEditor();
+      renderAreaList();
+      refreshAreaStyles();
+      openLayerPopupById(selectedAreaId);
+    });
     refs.areaList.appendChild(item);
   });
 }
@@ -275,6 +401,16 @@ function renderPrintCard(){
   refs.printEventNotes.textContent = state.eventNotes || "-";
 }
 
+function handleBeforePrint(){
+  if (!map) return;
+  map.invalidateSize();
+}
+
+function handleAfterPrint(){
+  if (!map) return;
+  setTimeout(() => map.invalidateSize(), 100);
+}
+
 function exportData(){
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -289,12 +425,14 @@ function exportData(){
 
 function resetDemo(){
   state = structuredClone(defaultState);
+  selectedAreaId = null;
   persist();
   fillForm();
   renderReferenceImage();
   renderPrintCard();
   if (drawnItems) drawnItems.clearLayers();
   renderAreaList();
+  renderSelectedAreaEditor();
   refs.mapSearchInput.value = "New England Tech East Greenwich";
   refs.referenceImageInput.value = "";
   if (map){
