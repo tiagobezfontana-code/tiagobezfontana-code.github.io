@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Parking Event Map V6</title>
+  <title>Parking Event Map V7</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.css">
   <link rel="stylesheet" href="style.css">
@@ -13,7 +13,7 @@
   <header class="topbar no-print">
     <div>
       <h1>Parking Event Map</h1>
-      <p class="subtitle">Satellite map, event area marking, and print-ready layout for tiagofontana.us/lab/test2</p>
+      <p class="subtitle">Satellite map, marked parking areas, and print-ready layout for tiagofontana.us/lab/test2</p>
     </div>
     <div class="header-actions">
       <button id="printBtn" class="btn">Print</button>
@@ -36,7 +36,7 @@
         <div id="map" class="map"></div>
 
         <div class="map-help no-print">
-          Use the mouse to move and zoom. Use the rectangle tool on the left side of the map to mark the event area.
+          Use the rectangle tool on the left side of the map to mark the event area. Click a yellow rectangle or a list item on the right to edit it.
         </div>
       </section>
 
@@ -78,9 +78,45 @@
             <input id="referenceImageInput" type="file" accept="image/*">
           </label>
 
+          <div class="reference-image-title">Reference image</div>
           <div class="reference-image-wrap">
             <img id="referenceImage" class="reference-image" alt="Reference image">
           </div>
+        </section>
+
+        <section class="panel no-print">
+          <div class="panel-title-row">
+            <h2>Selected Marked Area</h2>
+          </div>
+
+          <div id="noAreaSelected" class="empty-box">
+            Click a yellow marked area on the map or in the list below.
+          </div>
+
+          <form id="areaEditorForm" class="hidden">
+            <label>
+              <span>Area Name</span>
+              <input id="selectedAreaName" type="text" placeholder="Example: Student Parking Area">
+            </label>
+
+            <label>
+              <span>Area Notes</span>
+              <textarea id="selectedAreaNotes" rows="4" placeholder="Instructions for this highlighted area"></textarea>
+            </label>
+
+            <div class="button-row">
+              <button type="submit" class="btn">Save Area</button>
+              <button type="button" id="deleteAreaBtn" class="btn btn-danger">Delete Area</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title-row">
+            <h2>Marked Areas</h2>
+          </div>
+          <div id="areaList" class="area-list"></div>
+          <p class="small-note no-print">Click a rectangle or a list item to edit it in the panel above.</p>
         </section>
 
         <section class="panel">
@@ -110,14 +146,6 @@
               <li>Sports Fields</li>
             </ol>
           </div>
-        </section>
-
-        <section class="panel">
-          <div class="panel-title-row">
-            <h2>Marked Areas</h2>
-          </div>
-          <div id="areaList" class="area-list"></div>
-          <p class="small-note">Click a rectangle on the map to edit its label and notes.</p>
         </section>
 
         <section class="panel print-panel">
